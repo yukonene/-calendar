@@ -1,29 +1,33 @@
-import * as React from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Link from 'next/link';
+import { ChangeEvent, FocusEvent, useState } from 'react';
 
 export const Login = () => {
-  const [input, setInput] = React.useState('');
+  const [input, setInput] = useState('');
 
-  const [inputError, setInputError] = React.useState(false);
-  const onChangeInput = (event) => {
+  const [inputError, setInputError] = useState(false);
+  const onChangeInput = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setInput(event.target.value);
     if (event.target.value) {
       setInputError(false);
     }
   };
-  const onBlurInput = (event) => {
+  const onBlurInput = (
+    event: FocusEvent<HTMLInputElement | HTMLTextAreaElement, Element>
+  ) => {
     //TextFieldからフォーカスが離れたときに実行する関数
     if (!event.target.value) {
       setInputError(true);
     }
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    //ログインする
-  };
+  // const handleSubmit = (event) => {
+  //   event.preventDefault();
+  //   //ログインする
+  // };
   return (
     <div>
       <Box
@@ -39,7 +43,7 @@ export const Login = () => {
             label="メールアドレス"
             variant="standard"
             onChange={onChangeInput}
-            onBlur={onBlurInput}
+            onBlur={(e) => onBlurInput}
             error={inputError}
             helperText={inputError ? '入力してください' : ''}
           />

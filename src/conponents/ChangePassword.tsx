@@ -7,13 +7,17 @@ export const ChangePassword = () => {
   const [input, setInput] = React.useState('');
 
   const [inputError, setInputError] = React.useState(false);
-  const onChangeInput = (event) => {
+  const onChangeInput = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setInput(event.target.value);
     if (event.target.value) {
       setInputError(false);
     }
   };
-  const onBlurInput = (event) => {
+  const onBlurInput = (
+    event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement, Element>
+  ) => {
     if (!event.target.value) {
       setInputError(true);
     }
@@ -31,7 +35,7 @@ export const ChangePassword = () => {
         label="メールアドレス"
         variant="standard"
         onChange={onChangeInput}
-        onBlur={onBlurInput}
+        onBlur={(e) => onBlurInput}
         error={inputError}
         helperText={inputError ? '入力してください' : ''}
       />
