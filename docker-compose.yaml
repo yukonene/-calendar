@@ -1,0 +1,14 @@
+# https://zenn.dev/re24_1986/articles/b76c3fd8f76aec#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB
+
+services:
+  db:
+    image: postgres
+    volumes:
+      - psgl_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+volumes:
+  psgl_data:

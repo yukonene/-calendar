@@ -3,6 +3,8 @@ import { auth } from '@/lib/firebaseClient';
 import { useState } from 'react';
 import { cookieOptions } from '@/constants/cookieOptions';
 import { setCookie } from 'cookies-next';
+import axios from 'axios';
+import { Box, Button, TextField } from '@mui/material';
 
 export const Register = () => {
   // useStateでユーザーが入力したメールアドレスとパスワードをemailとpasswordに格納する
@@ -16,11 +18,12 @@ export const Register = () => {
       .then((userCredential) => {
         // ユーザー登録すると自動的にログインされてuserCredential.userでユーザーの情報を取得できる
         const user = userCredential.user;
-        // ユーザー登録ができたかどうかをわかりやすくするためのアラート
-        alert('登録完了！');
         console.log(user);
         user.getIdToken().then((token) => {
           setCookie('token', token, cookieOptions); //'key', value, options
+          axios.post('/api/users').then(() => {
+            console.log('response');
+          });
         });
       })
       .catch((error) => {
@@ -29,42 +32,66 @@ export const Register = () => {
   };
 
   return (
-    <div>
-      <h1>新規登録</h1>
-      {/* <div>
-        <Form>
-          <FormGroup>
-            <Label>メールアドレス：</Label>
-            <Input
-              type="email"
-              name="email"
-              style={{ height: 50, fontSize: '1.2rem' }}
-              // onChangeでユーザーが入力した値を取得し、その値をemailに入れる
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </FormGroup>
-          <FormGroup>
-            <Label>パスワード：</Label>
-            <Input
-              type="password"
-              name="password"
-              style={{ height: 50, fontSize: '1.2rem' }}
-              // onChangeでユーザーが入力した値を取得し、その値をpasswordに入れる
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </FormGroup>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        height: '100%',
+        justifyContent: 'center',
+      }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: '350px',
+        }}
+      >
+        <Box component="h1" sx={{ paddingBottom: '32px' }}>
+          title
+        </Box>
+
+        <Box
+          component="form"
+          sx={{
+            width: '350px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '16px',
+            border: '1px solid gray',
+            borderRadius: '5px',
+            padding: '32px',
+          }}
+        >
+          <Box component="h4">新規会員登録</Box>
+          <TextField label="メールアドレス" variant="standard" fullWidth />
+          <TextField
+            label="パスワード"
+            variant="standard"
+            type="password"
+            fullWidth
+          />
+          <TextField
+            label="パスワード確認"
+            variant="standard"
+            type="password"
+            fullWidth
+          />
           <Button
-            style={{ width: 220 }}
-            color="primary"
-            // 登録ボタンがクリックされたときdoRegister関数が実行されるようにする
-            onClick={() => {
-              doRegister();
-            }}
+            type="submit"
+            variant="contained"
+            sx={{ width: '200px', marginTop: '16px' }}
           >
             登録
           </Button>
-        </Form>
-      </div> */}
-    </div>
+        </Box>
+        <Box sx={{ display: 'flex', width: '100%' }}>
+          <Button sx={{ marginLeft: 'auto' }}>ログインはこちら</Button>
+        </Box>
+      </Box>
+    </Box>
   );
 };
