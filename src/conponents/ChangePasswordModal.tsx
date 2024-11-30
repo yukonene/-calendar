@@ -1,5 +1,5 @@
 import React from 'react';
-import Box from '@mui/material/Box';
+
 import TextField from '@mui/material/TextField';
 
 export const ChangePassword = () => {
@@ -24,32 +24,22 @@ export const ChangePassword = () => {
   };
 
   return (
-    <form
-      style={{
-        position: 'relative',
-      }}
-    >
-      <TextField
-        required
-        id="standard-required"
-        label="メールアドレス"
-        variant="standard"
-        onChange={onChangeInput}
-        onBlur={(e) => onBlurInput}
-        error={inputError}
-        helperText={inputError ? '入力してください' : ''}
-      />
-      <button
-        type="submit"
-        style={{
-          position: 'absolute',
-          height: '60%',
-          width: '10%',
-          top: '120%',
-        }}
-      >
-        送信
-      </button>
+    <form>
+      <div>
+        <TextField
+          required
+          id="standard-required"
+          label="メールアドレス"
+          variant="standard"
+          onChange={onChangeInput}
+          onBlur={onBlurInput}
+          error={inputError}
+          helperText={inputError ? '入力してください' : ''}
+        />
+      </div>
+      <div>
+        <button type="submit">送信</button>
+      </div>
     </form>
   );
 };
