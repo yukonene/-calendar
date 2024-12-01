@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "migrate": "dotenv -e .env.development.local npx prisma migrate dev --preview-feature",
-    "generate:sql:watch": "dotenv -e .env.development.local npx prisma generate --sql"
+    "studio": "dotenv -e .env.development.local npx prisma studio"
   },
   "dependencies": {
     "@emotion/react": "^11.13.5",

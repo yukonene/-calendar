@@ -1,6 +1,6 @@
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/lib/firebaseClient';
-import { useState } from 'react';
+import { auth } from '@/lib/firebase/firebaseClient';
+import { FormEvent, useState } from 'react';
 import { cookieOptions } from '@/constants/cookieOptions';
 import { setCookie } from 'cookies-next';
 import axios from 'axios';
@@ -10,9 +10,57 @@ export const Register = () => {
   // useStateでユーザーが入力したメールアドレスとパスワードをemailとpasswordに格納する
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordConfirmation, setPasswordConfirmation] = useState('');
+
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordConfirmationError, setPasswordConfirmationError] =
+    useState('');
 
   // ユーザーが登録ボタンを押したときにdoRegister関数が実行される
-  const doRegister = () => {
+  const register = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); //formのonsubmitのデフォルトの動作を強制的にストップする
+    if (!!email) {
+      setEmailError('');
+    } else {
+      setEmailError('メールアドレスを入力して下さい。');
+      return;
+    }
+
+    const emailRegex =
+      /^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]+.[A-Za-z0-9]+$/;
+    if (emailRegex.test(email)) {
+      //emailが正規表現に適合しているかtest
+      setEmailError('');
+    } else {
+      setEmailError('メールアドレスが間違っています。');
+      return;
+    }
+
+    if (!!password) {
+      setPasswordError('');
+    } else {
+      setPasswordError('パスワードを入力して下さい。');
+      return;
+    }
+    if (password.length > 7) {
+      setPasswordError('');
+    } else {
+      setPasswordError('パスワードが短すぎます。');
+      return;
+    }
+    if (!!passwordConfirmation) {
+      setPasswordConfirmationError('');
+    } else {
+      setPasswordConfirmationError('パスワードを入力して下さい。');
+      return;
+    }
+    if (password === passwordConfirmation) {
+      setPasswordConfirmationError('');
+    } else {
+      setPasswordConfirmationError('パスワードが一致しません。');
+      return;
+    }
     // Firebaseで用意されているユーザー登録の関数
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
@@ -30,7 +78,6 @@ export const Register = () => {
         console.log(error);
       });
   };
-
   return (
     <Box
       sx={{
@@ -50,11 +97,12 @@ export const Register = () => {
         }}
       >
         <Box component="h1" sx={{ paddingBottom: '32px' }}>
-          title
+          {process.env.NEXT_PUBLIC_APP_TITLE}
         </Box>
 
         <Box
           component="form"
+          onSubmit={register}
           sx={{
             width: '350px',
             display: 'flex',
@@ -67,18 +115,34 @@ export const Register = () => {
           }}
         >
           <Box component="h4">新規会員登録</Box>
-          <TextField label="メールアドレス" variant="standard" fullWidth />
+          <TextField
+            label="メールアドレス"
+            variant="standard"
+            fullWidth
+            onChange={(e) => setEmail(e.target.value)} //中身の変更
+            value={email} //表示
+            helperText={emailError}
+            error={!!emailError}
+          />
           <TextField
             label="パスワード"
             variant="standard"
             type="password"
             fullWidth
+            onChange={(e) => setPassword(e.target.value)}
+            value={password}
+            helperText={passwordError}
+            error={!!passwordError}
           />
           <TextField
             label="パスワード確認"
             variant="standard"
             type="password"
             fullWidth
+            onChange={(e) => setPasswordConfirmation(e.target.value)}
+            value={passwordConfirmation}
+            helperText={passwordConfirmationError}
+            error={!!passwordConfirmationError}
           />
           <Button
             type="submit"

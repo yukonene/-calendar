@@ -1,7 +1,5 @@
-import { MainPage } from "@/conponents/MainPage";
+import { Main } from '@/conponents/Main';
 
 export default function HomePage() {
-  return (
-    <MainPage/>
-  );
+  return <Main />;
 }

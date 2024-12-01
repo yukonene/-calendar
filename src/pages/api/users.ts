@@ -3,15 +3,21 @@
 import { cookieOptions } from '@/constants/cookieOptions';
 import { getCookie } from 'cookies-next';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getAuth } from 'firebase-admin/auth';
 import prisma from '@/lib/prisma';
+import { auth } from '@/lib/firebase/firebaseAdminClient';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  console.log(1);
   if (req.method === 'POST') {
-    const token = getCookie('token', { ...cookieOptions, req, res }) as string;
+    const token = (await getCookie('token', {
+      ...cookieOptions,
+      req,
+      res,
+    })) as string;
+    console.log(token);
     //バリデーションチェック
     if (!token) {
       //tokenがfalseの場合status401を返す
@@ -19,7 +25,7 @@ export default async function handler(
       return;
     }
     //トークンの検証をする
-    const auth = getAuth();
+
     try {
       const decodedToken = await auth.verifyIdToken(token); //トークンの検証に成功したらデータの復号化したデータを返す
       const uid = decodedToken.uid; //復号化したデータの中のuidを取り出す
@@ -45,6 +51,7 @@ export default async function handler(
       return;
     } catch (error) {
       res.status(500).end('Failed to register'); //例外なエラーが発生した時500をresする
+      console.log(error);
     }
   } else {
     res.status(405).end('method not allowed'); //methodがPOST以外の場合
