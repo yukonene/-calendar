@@ -4,7 +4,8 @@ import { FormEvent, useState } from 'react';
 import { cookieOptions } from '@/constants/cookieOptions';
 import { setCookie } from 'cookies-next';
 import axios from 'axios';
-import { Box, Button, TextField } from '@mui/material';
+import { Box, Button, Snackbar, TextField } from '@mui/material';
+import { FirebaseError } from 'firebase/app';
 
 export const Register = () => {
   // useStateでユーザーが入力したメールアドレスとパスワードをemailとpasswordに格納する
@@ -16,6 +17,8 @@ export const Register = () => {
   const [passwordError, setPasswordError] = useState('');
   const [passwordConfirmationError, setPasswordConfirmationError] =
     useState('');
+  // const [snackbarError, setSnackbarError] = useState('');
+  // const [isSnackbarErrorOpen, setIsSnackbarErrorOpen] = useState(false);
 
   // ユーザーが登録ボタンを押したときにdoRegister関数が実行される
   const register = (e: FormEvent<HTMLFormElement>) => {
@@ -75,7 +78,18 @@ export const Register = () => {
         });
       })
       .catch((error) => {
-        console.log(error);
+        if (error instanceof FirebaseError) {
+          // 例　{"code":"auth/email-already-in-use","customData":{"appName":"[DEFAULT]","_tokenResponse":{"error":{"code":400,"message":"EMAIL_EXISTS","errors":[{"message":"EMAIL_EXISTS","domain":"global","reason":"invalid"}]}}},"name":"FirebaseError"}
+          //エラーがfirebaseに関連したものであれば
+          console.log(JSON.stringify(error));
+          if (error.code === 'auth/email-already-in-use') {
+            // do something
+            setEmailError('すでに登録されているメールアドレスです。');
+          }
+        } else {
+          setEmailError('アカウントの作成に失敗しました。');
+          console.log(JSON.stringify(error));
+        }
       });
   };
   return (
@@ -88,6 +102,12 @@ export const Register = () => {
         justifyContent: 'center',
       }}
     >
+      {/* <Snackbar
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        open={isSnackbarErrorOpen}
+        onClose={() => setIsSnackbarErrorOpen(false)}
+        message="I love snacks"
+      /> */}
       <Box
         sx={{
           display: 'flex',
