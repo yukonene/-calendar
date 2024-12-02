@@ -17,8 +17,8 @@ export const Register = () => {
   const [passwordError, setPasswordError] = useState('');
   const [passwordConfirmationError, setPasswordConfirmationError] =
     useState('');
-  // const [snackbarError, setSnackbarError] = useState('');
-  // const [isSnackbarErrorOpen, setIsSnackbarErrorOpen] = useState(false);
+  const [snackbarError, setSnackbarError] = useState('');
+  const [isSnackbarErrorOpen, setIsSnackbarErrorOpen] = useState(false);
 
   // ユーザーが登録ボタンを押したときにdoRegister関数が実行される
   const register = (e: FormEvent<HTMLFormElement>) => {
@@ -72,9 +72,17 @@ export const Register = () => {
         console.log(user);
         user.getIdToken().then((token) => {
           setCookie('token', token, cookieOptions); //'key', value, options
-          axios.post('/api/users').then(() => {
-            console.log('response');
-          });
+          axios
+            .post('/api/users')
+            .then(() => {
+              console.log('response');
+            })
+            .catch((error) => {
+              //サーバー側で発生したエラーをキャッチして、snackbarにエラー文載せて表示
+              console.log(error);
+              setSnackbarError(error.response.data.error);
+              setIsSnackbarErrorOpen(true);
+            });
         });
       })
       .catch((error) => {
@@ -102,12 +110,12 @@ export const Register = () => {
         justifyContent: 'center',
       }}
     >
-      {/* <Snackbar
+      <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         open={isSnackbarErrorOpen}
         onClose={() => setIsSnackbarErrorOpen(false)}
-        message="I love snacks"
-      /> */}
+        message={snackbarError}
+      />
       <Box
         sx={{
           display: 'flex',

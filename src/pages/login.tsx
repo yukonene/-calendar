@@ -1,8 +1,5 @@
-import { Login } from "@/conponents/Login";
+import { Login } from '@/conponents/Login';
 
 export default function LoginPage() {
-    return (
-      <Login/>
-    );
-  }
-  
+  return <Login />;
+}

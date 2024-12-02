@@ -10,7 +10,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  console.log(1);
   if (req.method === 'POST') {
     const token = (await getCookie('token', {
       ...cookieOptions,
@@ -21,7 +20,7 @@ export default async function handler(
     //バリデーションチェック
     if (!token) {
       //tokenがfalseの場合status401を返す
-      res.status(401).end('authentication faild');
+      res.status(401).json({ error: 'authentication faild' });
       return;
     }
     //トークンの検証をする
@@ -37,7 +36,7 @@ export default async function handler(
       });
       if (!!user) {
         //userが存在した場合
-        res.status(409).end('Duplicate');
+        res.status(409).json({ error: 'Duplicate' });
         return;
       }
       await prisma.user.create({
@@ -50,10 +49,10 @@ export default async function handler(
       res.status(200).end(); //登録完了をresする
       return;
     } catch (error) {
-      res.status(500).end('Failed to register'); //例外なエラーが発生した時500をresする
+      res.status(500).json({ error: 'Failed to register' }); //例外なエラーが発生した時500をresする
       console.log(error);
     }
   } else {
-    res.status(405).end('method not allowed'); //methodがPOST以外の場合
+    res.status(405).json({ error: 'method not allowed' }); //methodがPOST以外の場合
   }
 }
