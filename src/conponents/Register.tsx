@@ -70,20 +70,22 @@ export const Register = () => {
         // ユーザー登録すると自動的にログインされてuserCredential.userでユーザーの情報を取得できる
         const user = userCredential.user;
         console.log(user);
-        user.getIdToken().then((token) => {
-          setCookie('token', token, cookieOptions); //'key', value, options
-          axios
-            .post('/api/users')
-            .then(() => {
-              console.log('response');
-            })
-            .catch((error) => {
-              //サーバー側で発生したエラーをキャッチして、snackbarにエラー文載せて表示
-              console.log(error);
-              setSnackbarError(error.response.data.error);
-              setIsSnackbarErrorOpen(true);
-            });
-        });
+        user
+          .getIdToken() //トークン取得
+          .then((token) => {
+            setCookie('token', token, cookieOptions); //'key', value, options
+            axios
+              .post('/api/users')
+              .then(() => {
+                console.log('response');
+              })
+              .catch((error) => {
+                //サーバー側で発生したエラーをキャッチして、snackbarにエラー文載せて表示
+                console.log(error);
+                setSnackbarError(error.response.data.error);
+                setIsSnackbarErrorOpen(true);
+              });
+          });
       })
       .catch((error) => {
         if (error instanceof FirebaseError) {
@@ -181,7 +183,9 @@ export const Register = () => {
           </Button>
         </Box>
         <Box sx={{ display: 'flex', width: '100%' }}>
-          <Button sx={{ marginLeft: 'auto' }}>ログインはこちら</Button>
+          <Button href="/login" sx={{ marginLeft: 'auto' }}>
+            ログインはこちら
+          </Button>
         </Box>
       </Box>
     </Box>

@@ -1,4 +1,5 @@
 // .envファイルで設定した環境変数をfirebaseConfigに入れる
+
 export const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_APIKEY,
   authDomain: process.env.NEXT_PUBLIC_AUTHDOMAIN,
