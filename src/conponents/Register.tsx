@@ -1,4 +1,7 @@
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from 'firebase/auth';
 import { auth } from '@/lib/firebase/firebaseClient';
 import { FormEvent, useState } from 'react';
 import { cookieOptions } from '@/constants/cookieOptions';
@@ -6,6 +9,7 @@ import { setCookie } from 'cookies-next';
 import axios from 'axios';
 import { Box, Button, Snackbar, TextField } from '@mui/material';
 import { FirebaseError } from 'firebase/app';
+import { useRouter } from 'next/router';
 
 export const Register = () => {
   // useStateでユーザーが入力したメールアドレスとパスワードをemailとpasswordに格納する
@@ -20,6 +24,8 @@ export const Register = () => {
   const [snackbarError, setSnackbarError] = useState('');
   const [isSnackbarErrorOpen, setIsSnackbarErrorOpen] = useState(false);
 
+  const router = useRouter();
+
   // ユーザーが登録ボタンを押したときにdoRegister関数が実行される
   const register = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault(); //formのonsubmitのデフォルトの動作を強制的にストップする
@@ -30,8 +36,7 @@ export const Register = () => {
       return;
     }
 
-    const emailRegex =
-      /^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]+.[A-Za-z0-9]+$/;
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
     if (emailRegex.test(email)) {
       //emailが正規表現に適合しているかtest
       setEmailError('');
@@ -77,7 +82,17 @@ export const Register = () => {
             axios
               .post('/api/users')
               .then(() => {
-                console.log('response');
+                sendEmailVerification(user)
+                  .then(() => {
+                    //確認メールの送信に成功したら
+                    console.log('確認メールを送信しました');
+                    router.push('/sendConfirmationEmail');
+                  }) //↓ここからエラー文
+                  .catch((error) => {
+                    console.log('確認メールの送信に失敗しました。');
+                    setSnackbarError('確認メールの送信に失敗しました。');
+                    setIsSnackbarErrorOpen(true);
+                  });
               })
               .catch((error) => {
                 //サーバー側で発生したエラーをキャッチして、snackbarにエラー文載せて表示

@@ -4,19 +4,11 @@ import Box from '@mui/material/Box';
 import axios from 'axios';
 import { setCookie } from 'cookies-next';
 import { FirebaseError } from 'firebase/app';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import Link from 'next/link';
 import { FormEvent, useState } from 'react';
-import { initializeApp } from 'firebase/app';
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  Firestore,
-} from 'firebase/firestore/lite';
-import { firebaseConfig } from '@/lib/firebase/firebaseConfig';
-import router from 'next/router';
 import { useRouter } from 'next/router';
+import { auth } from '@/lib/firebase/firebaseClient';
 
 export const Login = () => {
   const [email, setEmail] = useState('');
@@ -25,19 +17,12 @@ export const Login = () => {
   const [passwordError, setPasswordError] = useState('');
   const [loginError, setLoginError] = useState('');
   const [isSnackbarErrorOpen, setIsSnackbarErrorOpen] = useState(false);
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  const router = useRouter();
 
-  async function getCities(db: Firestore) {
-    const citiesCol = collection(db, 'cities');
-    const citySnapshot = await getDocs(citiesCol);
-    const cityList = citySnapshot.docs.map((doc) => doc.data());
-    return cityList;
-  }
-
-  const login = () => (e: FormEvent<HTMLFormElement>) => {
+  const login = (e: FormEvent<HTMLFormElement>) => {
+    console.log('0');
     e.preventDefault(); //formのonsubmitのデフォルトの動作を強制的にストップする
-
+    console.log('1');
     if (!!email) {
       setEmailError('');
     } else {
@@ -51,7 +36,6 @@ export const Login = () => {
       return;
     }
 
-    const auth = getAuth();
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in
@@ -62,10 +46,10 @@ export const Login = () => {
           .then((token) => {
             setCookie('token', token, cookieOptions); //'key', value, options
             axios
-              .post('/api/users')
+              .get('/api/login')
               .then(() => {
                 console.log('response');
-                const router = useRouter();
+                router.push('/');
               })
               .catch((error) => {
                 //サーバー側で発生したエラーをキャッチして、snackbarにエラー文載せて表示
@@ -88,25 +72,6 @@ export const Login = () => {
         }
       });
   };
-
-  //     .catch((error) => {
-  //       if (error instanceof FirebaseError) {
-  //         // 例　{"code":"auth/email-already-in-use","customData":{"appName":"[DEFAULT]","_tokenResponse":{"error":{"code":400,"message":"EMAIL_EXISTS","errors":[{"message":"EMAIL_EXISTS","domain":"global","reason":"invalid"}]}}},"name":"FirebaseError"}
-  //         //エラーがfirebaseに関連したものであれば
-
-  //         switch (error.code) {
-  //           case 'auth/user-not-found':
-  //           case 'auth/invalid-email':
-  //           case 'auth/wrong-password':
-  //             // パスワードが合致しない、ユーザが存在しなかったときの処理
-  //             console.log(error);
-  //             break;
-  //           default:
-  //           // その他のエラー時の処理
-  //         }
-  //       }
-  //     });
-  // };
   return (
     <Box
       sx={{
@@ -176,22 +141,25 @@ export const Login = () => {
             type="submit"
             variant="contained"
             sx={{ width: '200px', marginTop: '16px' }}
-            onClick={() => router.push('/index')}
           >
             ログイン
           </Button>
         </Box>
-
-        <Link
-          href="/changePassword"
-          style={{ width: '230px', marginTop: '16px' }}
-        >
-          パスワードを忘れた方はこちら
-        </Link>
         <Box sx={{ display: 'flex', width: '100%' }}>
-          <Button href="/register" sx={{ marginLeft: 'auto' }}>
-            新規会員登録はこちら
-          </Button>
+          <Link
+            href="/changePassword"
+            style={{ width: '230px', marginTop: '16px', marginLeft: 'auto' }}
+          >
+            パスワードを忘れた方はこちら
+          </Link>
+        </Box>
+        <Box sx={{ display: 'flex', width: '100%' }}>
+          <Link
+            href="/register"
+            style={{ marginLeft: 'auto', fontSize: 'small', marginTop: '7px' }}
+          >
+            新規会員登録
+          </Link>
         </Box>
       </Box>
     </Box>

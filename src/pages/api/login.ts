@@ -8,13 +8,13 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method === 'POST') {
+  if (req.method === 'GET') {
     const token = (await getCookie('token', {
       ...cookieOptions,
       req,
       res,
     })) as string;
-    console.log(token);
+
     //バリデーションチェック
     if (!token) {
       //tokenがfalseの場合status401を返す
@@ -26,15 +26,22 @@ export default async function handler(
     try {
       const decodedToken = await auth.verifyIdToken(token); //トークンの検証に成功したらデータの復号化したデータを返す
       const uid = decodedToken.uid; //復号化したデータの中のuidを取り出す
+      const isEmailVerified = decodedToken.email_verified;
       const user = await prisma.user.findUnique({
         //取り出したuidがusertable内で重複が無いかを確認する
         where: {
           uid: uid,
         },
       });
+      console.log('user', user);
+      if (!isEmailVerified) {
+        res
+          .status(401)
+          .json({ error: 'メールアドレスの認証が終わっていません。' });
+        return;
+      }
       if (!user) {
-        //userが存在した場合
-        res.status(409).json({ error: 'Duplicate' });
+        res.status(409).json({ error: '登録情報がありません。' });
         return;
       } else {
         res.status(200).end();

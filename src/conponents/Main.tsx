@@ -1,28 +1,36 @@
+import { Box, Button } from '@mui/material';
 import { NeneCalendar } from './Calendar';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase/firebaseClient';
 
 export const Main = () => {
+  const logout = () => {
+    auth.signOut();
+    console.log('signout');
+  };
   return (
-    <main
+    <Box
       style={{
         position: 'relative',
         display: 'inlineFlex',
       }}
     >
-      <div
+      <Button onClick={logout}>ログアウト</Button>
+      <Box
         style={{
           display: 'flex',
           flexDirection: 'row',
         }}
       >
-        <div
+        <Box
           style={{
             display: 'flex',
             flexDirection: 'column',
           }}
         >
           <NeneCalendar />
-        </div>
-      </div>
-    </main>
+        </Box>
+      </Box>
+    </Box>
   );
 };
