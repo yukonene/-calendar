@@ -11,12 +11,34 @@ import { Alert, Box, Button, Snackbar, TextField } from '@mui/material';
 import { FirebaseError } from 'firebase/app';
 import { useRouter } from 'next/router';
 import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
-type FormData = {
-  email: string;
-  password: string;
-  passwordConfirmation: string;
-};
+const registerFormSchema = z
+  .object({
+    email: z
+      .string()
+      .min(1, { message: 'メールアドレスを入力してください' })
+      .email({ message: '正しいメールアドレスの形式で入力してください。' }),
+
+    password: z
+      .string()
+      .min(8, { message: '8桁以上のパスワードを入力してください' })
+      .regex(/^[a-zA-Z0-9]+$/, {
+        message: '英大文字、英小文字、数字で入力してください',
+      }),
+    passwordConfirmation: z
+      .string()
+      .min(8, { message: '8桁以上のパスワードを入力してください' })
+      .regex(/^[a-zA-Z0-9]+$/, {
+        message: '英大文字、英小文字、数字で入力してください',
+      }),
+  }) //個々の設定↑　↓複合設定
+  .refine((data) => data.password === data.passwordConfirmation, {
+    message: 'パスワードと確認用パスワードが一致しません',
+    path: ['passwordConfirmation'],
+  });
+type RegisterFormSchemaType = z.infer<typeof registerFormSchema>;
 
 export const Register = () => {
   // useStateでユーザーが入力したメールアドレスとパスワードをemailとpasswordに格納する
@@ -34,8 +56,9 @@ export const Register = () => {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>({
+  } = useForm<RegisterFormSchemaType>({
     //<型>(中身：オブジェクトの形)
+    resolver: zodResolver(registerFormSchema),
     mode: 'onSubmit',
     criteriaMode: 'all',
     defaultValues: {
@@ -54,17 +77,20 @@ export const Register = () => {
   const router = useRouter();
 
   // ユーザーが登録ボタンを押したときにdoRegister関数が実行される
-  const register = (data: FormData) => {
+  const register = (data: RegisterFormSchemaType) => {
     // e.preventDefault(); //formのonsubmitのデフォルトの動作を強制的にストップする
     //↑↑再レンダリングされないから要らないくなった。
-    if (data.password !== data.passwordConfirmation) {
-      setSnackbarError({
-        severity: 'error',
-        text: 'パスワードが一致しません。',
-      });
-      setIsSnackbarErrorOpen(true);
-      return;
-    }
+
+    //↓↓zodで書き換えたからいらない
+    // if (data.password !== data.passwordConfirmation) {
+    //   setSnackbarError({
+    //     severity: 'error',
+    //     text: 'パスワードが一致しません。',
+    //   });
+    //   setIsSnackbarErrorOpen(true);
+    //   return;
+    // }
+
     // Firebaseで用意されているユーザー登録の関数
     createUserWithEmailAndPassword(auth, data.email, data.password)
       .then((userCredential) => {
@@ -181,13 +207,6 @@ export const Register = () => {
           <Controller
             control={control}
             name="email"
-            rules={{
-              required: 'メールアドレスを入力してください。',
-              pattern: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: '正しいメールアドレスの形式で入力してください。',
-              },
-            }}
             render={({ field }) => (
               <TextField
                 ref={field.ref}
@@ -207,7 +226,6 @@ export const Register = () => {
           <Controller
             control={control}
             name="password"
-            rules={{ required: 'パスワードを入力してください。' }}
             render={({ field }) => (
               <TextField
                 ref={field.ref}
@@ -228,7 +246,6 @@ export const Register = () => {
           <Controller
             control={control}
             name="passwordConfirmation"
-            rules={{ required: 'パスワードを入力してください。' }}
             render={({ field }) => (
               <TextField
                 ref={field.ref}
