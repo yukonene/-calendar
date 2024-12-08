@@ -9,34 +9,35 @@ import Link from 'next/link';
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/router';
 import { auth } from '@/lib/firebase/firebaseClient';
+import { Controller, useForm } from 'react-hook-form';
+
+type FormData = {
+  email: string;
+  password: string;
+};
 
 export const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+  const {
+    //何を使うか
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    //<型>(中身：オブジェクトの形)
+    mode: 'onSubmit',
+    criteriaMode: 'all',
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
+  console.log(errors);
   const [loginError, setLoginError] = useState('');
   const [isSnackbarErrorOpen, setIsSnackbarErrorOpen] = useState(false);
   const router = useRouter();
-
-  const login = (e: FormEvent<HTMLFormElement>) => {
-    console.log('0');
-    e.preventDefault(); //formのonsubmitのデフォルトの動作を強制的にストップする
-    console.log('1');
-    if (!!email) {
-      setEmailError('');
-    } else {
-      setEmailError('メールアドレスを入力して下さい。');
-      return;
-    }
-    if (!!password) {
-      setPasswordError('');
-    } else {
-      setPasswordError('パスワードを入力して下さい。');
-      return;
-    }
-
-    signInWithEmailAndPassword(auth, email, password)
+  console.log(0);
+  const login = (data: FormData) => {
+    signInWithEmailAndPassword(auth, data.email, data.password)
       .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
@@ -101,7 +102,7 @@ export const Login = () => {
         </Box>
         <Box
           component="form"
-          onSubmit={login}
+          onSubmit={handleSubmit(login)}
           sx={{
             width: '350px',
             display: 'flex',
@@ -115,25 +116,52 @@ export const Login = () => {
         >
           <Box component="h4">ログイン</Box>
           <Box>
-            <TextField
-              label="メールアドレス"
-              variant="standard"
-              fullWidth
-              onChange={(e) => setEmail(e.target.value)} //中身の変更
-              value={email} //表示
-              helperText={emailError}
-              error={!!emailError}
+            <Controller
+              control={control}
+              name="email"
+              rules={{
+                required: 'メールアドレスを入力してください。',
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  message: '正しいメールアドレスの形式で入力してください。',
+                },
+              }}
+              render={({ field }) => (
+                <TextField
+                  ref={field.ref}
+                  name={field.name}
+                  value={field.value}
+                  onChange={field.onChange} // send value to hook form
+                  onBlur={field.onBlur} // notify when input is touched/blur
+                  disabled={field.disabled}
+                  label="メールアドレス"
+                  variant="standard"
+                  fullWidth
+                  helperText={errors.email?.message}
+                  error={!!errors.email}
+                />
+              )}
             />
-
-            <TextField
-              label="パスワード"
-              variant="standard"
-              type="password"
-              fullWidth
-              onChange={(e) => setPassword(e.target.value)}
-              value={password}
-              helperText={passwordError}
-              error={!!passwordError}
+            <Controller
+              control={control}
+              name="password"
+              rules={{ required: 'パスワードを入力してください。' }}
+              render={({ field }) => (
+                <TextField
+                  ref={field.ref}
+                  name={field.name}
+                  value={field.value}
+                  onChange={field.onChange} // send value to hook form
+                  onBlur={field.onBlur} // notify when input is touched/blur
+                  disabled={field.disabled}
+                  label="パスワード"
+                  type="password"
+                  variant="standard"
+                  fullWidth
+                  helperText={errors.password?.message}
+                  error={!!errors.password}
+                />
+              )}
             />
           </Box>
 

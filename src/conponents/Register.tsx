@@ -7,70 +7,66 @@ import { FormEvent, useState } from 'react';
 import { cookieOptions } from '@/constants/cookieOptions';
 import { setCookie } from 'cookies-next';
 import axios from 'axios';
-import { Box, Button, Snackbar, TextField } from '@mui/material';
+import { Alert, Box, Button, Snackbar, TextField } from '@mui/material';
 import { FirebaseError } from 'firebase/app';
 import { useRouter } from 'next/router';
+import { Controller, useForm } from 'react-hook-form';
+
+type FormData = {
+  email: string;
+  password: string;
+  passwordConfirmation: string;
+};
 
 export const Register = () => {
   // useStateでユーザーが入力したメールアドレスとパスワードをemailとpasswordに格納する
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordConfirmation, setPasswordConfirmation] = useState('');
+  // const [email, setEmail] = useState('');
+  // const [password, setPassword] = useState('');
+  // const [passwordConfirmation, setPasswordConfirmation] = useState('');
 
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [passwordConfirmationError, setPasswordConfirmationError] =
-    useState('');
-  const [snackbarError, setSnackbarError] = useState('');
+  // const [emailError, setEmailError] = useState('');
+  // const [passwordError, setPasswordError] = useState('');
+  // const [passwordConfirmationError, setPasswordConfirmationError] =
+  //   useState('');
+  //↓↓useFormで書き換え
+  const {
+    //何を使うか
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    //<型>(中身：オブジェクトの形)
+    mode: 'onSubmit',
+    criteriaMode: 'all',
+    defaultValues: {
+      email: '',
+      password: '',
+      passwordConfirmation: '',
+    },
+  });
+  console.log(errors);
+  const [snackbarError, setSnackbarError] = useState<{
+    severity: 'success' | 'error';
+    text: string;
+  }>({ severity: 'error', text: '' });
   const [isSnackbarErrorOpen, setIsSnackbarErrorOpen] = useState(false);
 
   const router = useRouter();
 
   // ユーザーが登録ボタンを押したときにdoRegister関数が実行される
-  const register = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); //formのonsubmitのデフォルトの動作を強制的にストップする
-    if (!!email) {
-      setEmailError('');
-    } else {
-      setEmailError('メールアドレスを入力して下さい。');
-      return;
-    }
-
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-    if (emailRegex.test(email)) {
-      //emailが正規表現に適合しているかtest
-      setEmailError('');
-    } else {
-      setEmailError('メールアドレスが間違っています。');
-      return;
-    }
-
-    if (!!password) {
-      setPasswordError('');
-    } else {
-      setPasswordError('パスワードを入力して下さい。');
-      return;
-    }
-    if (password.length > 7) {
-      setPasswordError('');
-    } else {
-      setPasswordError('パスワードが短すぎます。');
-      return;
-    }
-    if (!!passwordConfirmation) {
-      setPasswordConfirmationError('');
-    } else {
-      setPasswordConfirmationError('パスワードを入力して下さい。');
-      return;
-    }
-    if (password === passwordConfirmation) {
-      setPasswordConfirmationError('');
-    } else {
-      setPasswordConfirmationError('パスワードが一致しません。');
+  const register = (data: FormData) => {
+    // e.preventDefault(); //formのonsubmitのデフォルトの動作を強制的にストップする
+    //↑↑再レンダリングされないから要らないくなった。
+    if (data.password !== data.passwordConfirmation) {
+      setSnackbarError({
+        severity: 'error',
+        text: 'パスワードが一致しません。',
+      });
+      setIsSnackbarErrorOpen(true);
       return;
     }
     // Firebaseで用意されているユーザー登録の関数
-    createUserWithEmailAndPassword(auth, email, password)
+    createUserWithEmailAndPassword(auth, data.email, data.password)
       .then((userCredential) => {
         // ユーザー登録すると自動的にログインされてuserCredential.userでユーザーの情報を取得できる
         const user = userCredential.user;
@@ -90,14 +86,20 @@ export const Register = () => {
                   }) //↓ここからエラー文
                   .catch((error) => {
                     console.log('確認メールの送信に失敗しました。');
-                    setSnackbarError('確認メールの送信に失敗しました。');
+                    setSnackbarError({
+                      severity: 'error',
+                      text: '確認メールの送信に失敗しました。',
+                    });
                     setIsSnackbarErrorOpen(true);
                   });
               })
               .catch((error) => {
                 //サーバー側で発生したエラーをキャッチして、snackbarにエラー文載せて表示
                 console.log(error);
-                setSnackbarError(error.response.data.error);
+                setSnackbarError({
+                  severity: 'error',
+                  text: error.response.data.error,
+                });
                 setIsSnackbarErrorOpen(true);
               });
           });
@@ -109,10 +111,18 @@ export const Register = () => {
           console.log(JSON.stringify(error));
           if (error.code === 'auth/email-already-in-use') {
             // do something
-            setEmailError('すでに登録されているメールアドレスです。');
+            setSnackbarError({
+              severity: 'error',
+              text: 'すでに登録されているメールアドレスです。',
+            });
+            setIsSnackbarErrorOpen(true);
           }
         } else {
-          setEmailError('アカウントの作成に失敗しました。');
+          setSnackbarError({
+            severity: 'error',
+            text: 'アカウントの作成に失敗しました。',
+          });
+          setIsSnackbarErrorOpen(true);
           console.log(JSON.stringify(error));
         }
       });
@@ -131,8 +141,16 @@ export const Register = () => {
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         open={isSnackbarErrorOpen}
         onClose={() => setIsSnackbarErrorOpen(false)}
-        message={snackbarError}
-      />
+      >
+        <Alert
+          onClose={() => setIsSnackbarErrorOpen(false)}
+          severity={snackbarError.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbarError.text}
+        </Alert>
+      </Snackbar>
       <Box
         sx={{
           display: 'flex',
@@ -147,7 +165,7 @@ export const Register = () => {
 
         <Box
           component="form"
-          onSubmit={register}
+          onSubmit={handleSubmit(register)}
           sx={{
             width: '350px',
             display: 'flex',
@@ -160,35 +178,75 @@ export const Register = () => {
           }}
         >
           <Box component="h4">新規会員登録</Box>
-          <TextField
-            label="メールアドレス"
-            variant="standard"
-            fullWidth
-            onChange={(e) => setEmail(e.target.value)} //中身の変更
-            value={email} //表示
-            helperText={emailError}
-            error={!!emailError}
+          <Controller
+            control={control}
+            name="email"
+            rules={{
+              required: 'メールアドレスを入力してください。',
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: '正しいメールアドレスの形式で入力してください。',
+              },
+            }}
+            render={({ field }) => (
+              <TextField
+                ref={field.ref}
+                name={field.name}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                disabled={field.disabled}
+                label="メールアドレス"
+                variant="standard"
+                fullWidth
+                helperText={errors.email?.message}
+                error={!!errors.email}
+              />
+            )}
           />
-          <TextField
-            label="パスワード"
-            variant="standard"
-            type="password"
-            fullWidth
-            onChange={(e) => setPassword(e.target.value)}
-            value={password}
-            helperText={passwordError}
-            error={!!passwordError}
+          <Controller
+            control={control}
+            name="password"
+            rules={{ required: 'パスワードを入力してください。' }}
+            render={({ field }) => (
+              <TextField
+                ref={field.ref}
+                name={field.name}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                disabled={field.disabled}
+                label="パスワード"
+                type="password"
+                variant="standard"
+                fullWidth
+                helperText={errors.password?.message}
+                error={!!errors.password}
+              />
+            )}
           />
-          <TextField
-            label="パスワード確認"
-            variant="standard"
-            type="password"
-            fullWidth
-            onChange={(e) => setPasswordConfirmation(e.target.value)}
-            value={passwordConfirmation}
-            helperText={passwordConfirmationError}
-            error={!!passwordConfirmationError}
+          <Controller
+            control={control}
+            name="passwordConfirmation"
+            rules={{ required: 'パスワードを入力してください。' }}
+            render={({ field }) => (
+              <TextField
+                ref={field.ref}
+                name={field.name}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                disabled={field.disabled}
+                label="パスワード確認"
+                type="password"
+                variant="standard"
+                fullWidth
+                helperText={errors.passwordConfirmation?.message}
+                error={!!errors.passwordConfirmation}
+              />
+            )}
           />
+
           <Button
             type="submit"
             variant="contained"
