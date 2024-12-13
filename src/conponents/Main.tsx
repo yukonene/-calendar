@@ -9,13 +9,15 @@ export const Main = () => {
     console.log('signout');
   };
   return (
-    <Box
+    <Box //全体の
       style={{
         position: 'relative',
         display: 'inlineFlex',
       }}
     >
-      <Button onClick={logout}>ログアウト</Button>
+      <Box>
+        <Button onClick={logout}>ログアウト</Button>
+      </Box>
       <Box
         style={{
           display: 'flex',
@@ -23,12 +25,20 @@ export const Main = () => {
         }}
       >
         <Box
-          style={{
+          sx={{
             display: 'flex',
             flexDirection: 'column',
           }}
         >
           <NeneCalendar />
+        </Box>
+        <Box
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          日ごと
         </Box>
       </Box>
     </Box>

@@ -10,11 +10,24 @@ import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/router';
 import { auth } from '@/lib/firebase/firebaseClient';
 import { Controller, useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-type FormData = {
-  email: string;
-  password: string;
-};
+const loginFormSchema = z //zod
+  .object({
+    email: z
+      .string()
+      .min(1, { message: 'メールアドレスを入力してください' })
+      .email({ message: '正しいメールアドレスの形式で入力してください。' }),
+
+    password: z
+      .string()
+      .min(8, { message: '8桁以上のパスワードを入力してください' })
+      .regex(/^[a-zA-Z0-9]+$/, {
+        message: '英大文字、英小文字、数字で入力してください',
+      }),
+  });
+type LoginFormSchemaType = z.infer<typeof loginFormSchema>;
 
 export const Login = () => {
   const {
@@ -22,8 +35,9 @@ export const Login = () => {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>({
+  } = useForm<LoginFormSchemaType>({
     //<型>(中身：オブジェクトの形)
+    resolver: zodResolver(loginFormSchema),
     mode: 'onSubmit',
     criteriaMode: 'all',
     defaultValues: {
@@ -36,7 +50,7 @@ export const Login = () => {
   const [isSnackbarErrorOpen, setIsSnackbarErrorOpen] = useState(false);
   const router = useRouter();
   console.log(0);
-  const login = (data: FormData) => {
+  const login = (data: LoginFormSchemaType) => {
     signInWithEmailAndPassword(auth, data.email, data.password)
       .then((userCredential) => {
         // Signed in
@@ -145,7 +159,6 @@ export const Login = () => {
             <Controller
               control={control}
               name="password"
-              rules={{ required: 'パスワードを入力してください。' }}
               render={({ field }) => (
                 <TextField
                   ref={field.ref}

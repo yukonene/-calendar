@@ -4,7 +4,9 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-//サーバーからDBへ移動の際のＥＴＣのようなもの
+//サーバーからDBへ移動の際のＥＴＣのようなもの。入口。
+
+//sqlのファイルのまとめ。
 
 generator client {
   provider = "prisma-client-js"
@@ -17,10 +19,29 @@ datasource db {
 
 //tableの設定
 model User {
-  id            Int         @default(autoincrement()) @id
-  uid           String @unique
+  id            Int       @default(autoincrement()) @id
+  uid           String    @unique
   name          String
+  profile       String?   @db.Text
   createdAt     DateTime  @default(now()) @map(name: "created_at")
   updatedAt     DateTime  @updatedAt @map(name: "updated_at")
+  events Event[]
 }
 
+model Event{
+  id            Int       @default(autoincrement()) @id
+  title         String
+  dateTime      DateTime
+  place         String
+  url           String    @db.Text
+  member        String?
+  memo          String?
+  diary         String?
+  success       Boolean?
+  createdAt     DateTime  @default(now()) @map(name: "created_at")
+  updatedAt     DateTime  @updatedAt @map(name: "updated_at")
+  user   User @relation(fields: [userId], references: [id]) //UsertabelにEventtableを紐付ける
+  userId Int
+}
+
+//書き換えた際、"npm run migrate"で正式なSQLファイルを作り、DBへの反映をすること。 

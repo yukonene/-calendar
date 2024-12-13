@@ -3,10 +3,16 @@ import { Alert, Box, Button, Snackbar, TextField } from '@mui/material';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { FormEvent, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { z } from 'zod';
 
-type FormData = {
-  email: string;
-};
+const changePasswordFormSchema = z.object({
+  email: z
+    .string()
+    .min(1, { message: 'メールアドレスを入力してください' })
+    .email({ message: '正しいメールアドレスの形式で入力してください。' }),
+});
+
+type ChangePasswordFormSchemaType = z.infer<typeof changePasswordFormSchema>;
 
 export const ChangePassword = () => {
   const {
@@ -14,7 +20,7 @@ export const ChangePassword = () => {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>({
+  } = useForm<ChangePasswordFormSchemaType>({
     //<型>(中身：オブジェクトの形)
     mode: 'onSubmit',
     criteriaMode: 'all',
@@ -29,7 +35,7 @@ export const ChangePassword = () => {
   }>({ severity: 'error', text: '' });
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
 
-  const changePassword = (data: FormData) => {
+  const changePassword = (data: ChangePasswordFormSchemaType) => {
     sendPasswordResetEmail(auth, data.email) //パスワード変更の為のメールを送る
       .then(() => {
         setIsSnackbarOpen(true);
