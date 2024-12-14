@@ -31,9 +31,10 @@ model User {
 model Event{
   id            Int       @default(autoincrement()) @id
   title         String
-  dateTime      DateTime
-  place         String
-  url           String    @db.Text
+  startDateTime DateTime
+  endDateTime   DateTime?
+  place         String?
+  url           String?    @db.Text
   member        String?
   memo          String?
   diary         String?
