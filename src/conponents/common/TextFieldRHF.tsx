@@ -3,7 +3,7 @@ import { HTMLInputTypeAttribute } from 'react';
 import { Control, Controller, FieldPath, FieldValues } from 'react-hook-form';
 
 type Props<T extends FieldValues> = {
-  control: Control<T, any>;
+  control: Control<T, any>; // eslint-disable-line
   name: FieldPath<T>;
   label: string;
   type?: HTMLInputTypeAttribute | undefined;
