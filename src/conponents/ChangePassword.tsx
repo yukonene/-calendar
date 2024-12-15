@@ -97,9 +97,6 @@ export const ChangePassword = () => {
         <Controller
           control={control}
           name="email"
-          rules={{
-            required: 'メールアドレスを入力してください。',
-          }}
           render={({ field }) => (
             <TextField
               ref={field.ref}

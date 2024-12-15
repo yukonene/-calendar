@@ -133,13 +133,6 @@ export const Login = () => {
             <Controller
               control={control}
               name="email"
-              rules={{
-                required: 'メールアドレスを入力してください。',
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: '正しいメールアドレスの形式で入力してください。',
-                },
-              }}
               render={({ field }) => (
                 <TextField
                   ref={field.ref}

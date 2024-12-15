@@ -26,6 +26,8 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
 import { ja } from 'date-fns/locale/ja';
 import { format } from 'date-fns';
 import { Dispatch, SetStateAction, useState } from 'react';
+import { TextFieldRHF } from '../common/TextFieldRHF';
+import { DatePickerRHF } from '../common/DatePickerRHF';
 
 const style = {
   position: 'relative',
@@ -158,26 +160,10 @@ export const NewEventModalContent = ({
             width: '100%',
           }}
         >
-          <Controller
+          <TextFieldRHF<EventSchemaType>
             control={control}
             name="title"
-            render={({ field }) => {
-              return (
-                <TextField
-                  ref={field.ref}
-                  name={field.name}
-                  value={field.value}
-                  onChange={field.onChange}
-                  onBlur={field.onBlur}
-                  disabled={field.disabled}
-                  label="イベントタイトル"
-                  variant="standard"
-                  fullWidth
-                  helperText={errors.title?.message}
-                  error={!!errors.title}
-                />
-              );
-            }}
+            label="イベントタイトル"
           />
           <Box
             sx={{
@@ -186,156 +172,38 @@ export const NewEventModalContent = ({
               alignItems: 'center',
             }}
           >
-            <Controller
+            <DatePickerRHF<EventSchemaType>
               name="startDateTime"
               control={control}
-              render={({ field }) => {
-                return (
-                  <LocalizationProvider
-                    dateAdapter={AdapterDateFns}
-                    adapterLocale={ja}
-                  >
-                    <DateTimePicker
-                      ref={field.ref}
-                      name={field.name}
-                      value={field.value}
-                      onChange={field.onChange}
-                      disabled={field.disabled}
-                      format={'MM月dd日 hh:mm'}
-                      viewRenderers={{
-                        hours: null,
-                        minutes: null,
-                        seconds: null,
-                      }}
-                      slotProps={{
-                        textField: {
-                          helperText: errors.startDateTime?.message,
-                          error: !!errors.startDateTime,
-                        },
-                      }}
-                      label="開催日時"
-                    />
-                  </LocalizationProvider>
-                );
-              }}
+              label="開催日時"
             />
             <Box>-</Box>
-            <Controller
+            <DatePickerRHF<EventSchemaType>
               name="endDateTime"
               control={control}
-              render={({ field }) => {
-                return (
-                  <LocalizationProvider
-                    dateAdapter={AdapterDateFns}
-                    adapterLocale={ja}
-                  >
-                    <DateTimePicker
-                      ref={field.ref}
-                      name={field.name}
-                      value={field.value}
-                      onChange={field.onChange}
-                      disabled={field.disabled}
-                      format={'MM月dd日 hh:mm'}
-                      viewRenderers={{
-                        hours: null,
-                        minutes: null,
-                        seconds: null,
-                      }}
-                      slotProps={{
-                        textField: {
-                          helperText: errors.endDateTime?.message,
-                          error: !!errors.endDateTime,
-                        },
-                      }}
-                      label="終了日時"
-                    />
-                  </LocalizationProvider>
-                );
-              }}
+              label="終了日時"
             />
           </Box>
-          <Controller
+          <TextFieldRHF<EventSchemaType>
             control={control}
             name="place"
-            render={({ field }) => (
-              <TextField
-                ref={field.ref}
-                name={field.name}
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                disabled={field.disabled}
-                label="開催場所"
-                type="place"
-                variant="standard"
-                fullWidth
-                helperText={errors.place?.message}
-                error={!!errors.place}
-              />
-            )}
+            label="開催場所"
           />
-          <Controller
+          <TextFieldRHF<EventSchemaType>
             control={control}
             name="url"
-            render={({ field }) => (
-              <TextField
-                ref={field.ref}
-                name={field.name}
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                disabled={field.disabled}
-                label="イベントページURL"
-                type="url"
-                variant="standard"
-                fullWidth
-                helperText={errors.url?.message}
-                error={!!errors.url}
-                // リンクつける
-              />
-            )}
+            label="イベントページURL"
+            // リンクつける
           />
-          <Controller
+          <TextFieldRHF<EventSchemaType>
             control={control}
             name="member"
-            render={({ field }) => (
-              <TextField
-                ref={field.ref}
-                name={field.name}
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                disabled={field.disabled}
-                label="同行メンバー"
-                type="member"
-                variant="standard"
-                fullWidth
-                helperText={errors.member?.message}
-                error={!!errors.member}
-              />
-            )}
+            label="同行メンバー"
           />
-          <Controller
+          <TextFieldRHF<EventSchemaType>
             control={control}
             name="memo"
-            render={({ field }) => (
-              <TextField
-                ref={field.ref}
-                name={field.name}
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                disabled={field.disabled}
-                label="詳細memo"
-                type="memo"
-                variant="standard"
-                multiline
-                rows={3}
-                fullWidth
-                helperText={errors.memo?.message}
-                error={!!errors.memo}
-              />
-            )}
+            label="詳細memo"
           />
           <Box
             sx={{
