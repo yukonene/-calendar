@@ -78,7 +78,7 @@ export default async function handler(
             // そのためstring型にするが、stringだとSat Dec 14 2024 20:36:06 GMT+0900 (日本標準時)でわかりにくい為、
             // toISOSting()でISO8601の表示形式にする'2024-12-14T11:36:06.137Z'
             startDateTime: event.startDateTime.toISOString(),
-            endDareTime: event.endDateTime?.toISOString() || null,
+            endDateTime: event.endDateTime?.toISOString() || null,
           };
         });
         res.status(200).json({ events: data });
@@ -138,19 +138,29 @@ export default async function handler(
           memo: body.memo,
           userId: user.id,
         };
-        const eventScheme = z.object({
-          title: z
-            .string()
-            .min(1, { message: 'イベントタイトルを入力してください' })
-            .max(50, { message: 'イベントタイトルが長すぎます' }),
-          startDateTime: z.date(),
-          endDateTime: z.date().nullable(), //nullかも
-          place: z.string().max(100, { message: '文字数超過' }).nullable(),
-          url: z.string().max(200, { message: '文字数超過' }).nullable(),
-          member: z.string().max(100, { message: '文字数超過' }).nullable(),
-          memo: z.string().max(255, { message: '文字数超過' }).nullable(),
-          userId: z.number(),
-        });
+        const eventScheme = z
+          .object({
+            title: z
+              .string()
+              .min(1, { message: 'イベントタイトルを入力してください' })
+              .max(50, { message: 'イベントタイトルが長すぎます' }),
+            startDateTime: z.date(),
+            endDateTime: z.date().nullable(), //nullかも
+            place: z.string().max(100, { message: '文字数超過' }).nullable(),
+            url: z.string().max(200, { message: '文字数超過' }).nullable(),
+            member: z.string().max(100, { message: '文字数超過' }).nullable(),
+            memo: z.string().max(255, { message: '文字数超過' }).nullable(),
+            userId: z.number(),
+          })
+          .refine(
+            //終了日時がnull、もしくは終了時刻が開始日時より後の場合正しい入力値とする。
+            (data) =>
+              !data.endDateTime || data.startDateTime <= data.endDateTime,
+            {
+              message: '終了日時は開始日時の後に設定してください',
+              path: ['endDateTime'],
+            }
+          );
 
         const result = eventScheme.safeParse(rawData);
         if (!result.success) {

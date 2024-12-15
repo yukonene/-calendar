@@ -1,26 +1,37 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import allLocales from '@fullcalendar/core/locales-all';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 
-import { Box } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import axios from 'axios';
+import { NewEventModal } from './new_event_modal/NewEventModal';
 
 export const NeneCalendar = () => {
+  const [isNewEventModalOpen, setIsNewEventModalOpen] = useState(false);
+  const [date, setDate] = useState<Date>(); //モーダルに日付データを渡す
+  //モーダルopen時
   const handleDateClick = useCallback((info: DateClickArg) => {
-    alert('Clicked on: ' + info.dateStr);
+    console.log(info);
+    setIsNewEventModalOpen(true);
+    setDate(info.date);
   }, []);
-  useEffect(() => {
-    axios
-      .get('http://localhost:3000')
-      .then((response) => {
-        console.log(response.data.message);
-      })
-      .catch((e) => {
-        console.log(e.message);
-      });
+  //モーダルclose時
+  const handleCloseModal = useCallback(() => {
+    setIsNewEventModalOpen(false);
+    setDate(undefined);
   }, []);
+  // useEffect(() => {
+  //   axios
+  //     .get('http://localhost:3000')
+  //     .then((response) => {
+  //       console.log(response.data.message);
+  //     })
+  //     .catch((e) => {
+  //       console.log(e.message);
+  //     });
+  // }, []);
   return (
     <Box sx={{ minWidth: '50vw' }}>
       <FullCalendar
@@ -46,26 +57,12 @@ export const NeneCalendar = () => {
         // }}
         dateClick={handleDateClick}
       />
+
+      <NewEventModal //イベント登録モーダル
+        isOpen={isNewEventModalOpen}
+        onClose={handleCloseModal}
+        date={date}
+      />
     </Box>
   );
 };
-
-// import FullCalendar from '@fullcalendar/react';
-// import dayGridPlugin from '@fullcalendar/daygrid';
-// import { Calendar } from '@fullcalendar/core/index.js';
-
-// export const NeneCalendar = () => {
-//   return (
-//     <div>
-//       <FullCalendar
-//         plugins={[dayGridPlugin]}
-//         initialView="dayGridMonth"
-//         weekends={false}
-//         events={[
-//           { title: 'event 1', date: '2024-11-15' },
-//           { title: 'event 2', date: '2019-04-02' },
-//         ]}
-//       />
-//     </div>
-//   );
-// };
