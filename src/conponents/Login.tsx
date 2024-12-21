@@ -1,17 +1,19 @@
 import { cookieOptions } from '@/constants/cookieOptions';
-import { Button, Snackbar, TextField } from '@mui/material';
+import { Button, Snackbar } from '@mui/material';
 import Box from '@mui/material/Box';
 import axios from 'axios';
 import { setCookie } from 'cookies-next';
 import { FirebaseError } from 'firebase/app';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import Link from 'next/link';
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { auth } from '@/lib/firebase/firebaseClient';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { TextFieldRHF } from './common/TextFieldRHF';
+import { useFirebaseUserContext } from './common/FirebaseUserProvider';
 
 const loginFormSchema = z //zod
   .object({
@@ -30,6 +32,7 @@ const loginFormSchema = z //zod
 type LoginFormSchemaType = z.infer<typeof loginFormSchema>;
 
 export const Login = () => {
+  const { setFirebaseUser } = useFirebaseUserContext();
   const {
     //何を使うか
     control,
@@ -51,6 +54,7 @@ export const Login = () => {
   const router = useRouter();
   console.log(0);
   const login = (data: LoginFormSchemaType) => {
+    console.log(data);
     signInWithEmailAndPassword(auth, data.email, data.password)
       .then((userCredential) => {
         // Signed in
@@ -64,6 +68,7 @@ export const Login = () => {
               .get('/api/login')
               .then(() => {
                 console.log('response');
+                setFirebaseUser(user); //ログインの状態を保持
                 router.push('/');
               })
               .catch((error) => {
@@ -130,44 +135,34 @@ export const Login = () => {
         >
           <Box component="h4">ログイン</Box>
           <Box>
-            <Controller
+            {/* ControllerをTextFieldRHFで書き換えて整理する */}
+            {/* name等固有のものは残し、共通のものは書き換え。 */}
+            <TextFieldRHF<LoginFormSchemaType>
+              // <Controller
               control={control}
               name="email"
-              render={({ field }) => (
-                <TextField
-                  ref={field.ref}
-                  name={field.name}
-                  value={field.value}
-                  onChange={field.onChange} // send value to hook form
-                  onBlur={field.onBlur} // notify when input is touched/blur
-                  disabled={field.disabled}
-                  label="メールアドレス"
-                  variant="standard"
-                  fullWidth
-                  helperText={errors.email?.message}
-                  error={!!errors.email}
-                />
-              )}
+              label="メールアドレス"
+              // render={({ field }) => (
+              //   <TextField
+              //     ref={field.ref}
+              //     name={field.name}
+              //     value={field.value}
+              //     onChange={field.onChange} // send value to hook form
+              //     onBlur={field.onBlur} // notify when input is touched/blur
+              //     disabled={field.disabled}
+
+              // variant="standard"
+              // fullWidth
+              // helperText={errors.email?.message}
+              // error={!!errors.email}
+              // />
+              // )}
             />
-            <Controller
+            <TextFieldRHF<LoginFormSchemaType>
               control={control}
               name="password"
-              render={({ field }) => (
-                <TextField
-                  ref={field.ref}
-                  name={field.name}
-                  value={field.value}
-                  onChange={field.onChange} // send value to hook form
-                  onBlur={field.onBlur} // notify when input is touched/blur
-                  disabled={field.disabled}
-                  label="パスワード"
-                  type="password"
-                  variant="standard"
-                  fullWidth
-                  helperText={errors.password?.message}
-                  error={!!errors.password}
-                />
-              )}
+              label="パスワード"
+              type="password"
             />
           </Box>
 

@@ -1,16 +1,18 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import allLocales from '@fullcalendar/core/locales-all';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 
-import { Box, Button } from '@mui/material';
+import { Box } from '@mui/material';
 import axios from 'axios';
 import { NewEventModal } from './new_event_modal/NewEventModal';
+import { GetEventsResponseSuccessBody } from '@/pages/api/events';
 
 export const NeneCalendar = () => {
   const [isNewEventModalOpen, setIsNewEventModalOpen] = useState(false);
   const [date, setDate] = useState<Date>(); //モーダルに日付データを渡す
+
   //モーダルopen時
   const handleDateClick = useCallback((info: DateClickArg) => {
     console.log(info);
@@ -22,16 +24,44 @@ export const NeneCalendar = () => {
     setIsNewEventModalOpen(false);
     setDate(undefined);
   }, []);
-  // useEffect(() => {
-  //   axios
-  //     .get('http://localhost:3000')
-  //     .then((response) => {
-  //       console.log(response.data.message);
-  //     })
-  //     .catch((e) => {
-  //       console.log(e.message);
-  //     });
-  // }, []);
+
+  const [events, setEvents] = useState<
+    {
+      id: number;
+      title: string;
+      startDateTime: string;
+      endDateTime: string | null;
+    }[]
+  >([]);
+
+  const eventList = useMemo(() => {
+    return events.map((event) => {
+      return {
+        id: event.id.toString(), //typeを文字列に変換
+        title: event.title,
+        start: new Date(event.startDateTime),
+        end: !!event.endDateTime ? new Date(event.endDateTime) : undefined,
+      };
+    });
+  }, [events]);
+
+  const getEvents = useCallback(() => {
+    //基本的にはusecallbackつける
+    axios
+      .get<GetEventsResponseSuccessBody>('/api/events/')
+      .then((res) => {
+        setEvents(res.data.events); //GetEventsResponseSuccessBody=res.data
+      })
+
+      .catch((e) => {
+        console.log(e.message);
+      });
+  }, []);
+
+  useEffect(() => {
+    //初回レンダリング時にイベントデータを取って来る
+    getEvents();
+  }, []);
   return (
     <Box sx={{ minWidth: '50vw' }}>
       <FullCalendar
@@ -46,15 +76,7 @@ export const NeneCalendar = () => {
           minute: '2-digit',
           meridiem: false,
         }}
-        // events={{
-        //   url: `/api/schedule/`,
-        //   method: 'GET',
-        //   extraParams: () => {}, // サーバーに送信するその他の GET/POST データ。key: valueの形式で書く
-        //   failure: (error) => {
-        //     //エラーの時に書くもの
-        //     console.log(error);
-        //   },
-        // }}
+        events={eventList}
         dateClick={handleDateClick}
       />
 
@@ -62,6 +84,7 @@ export const NeneCalendar = () => {
         isOpen={isNewEventModalOpen}
         onClose={handleCloseModal}
         date={date}
+        getEvents={getEvents}
       />
     </Box>
   );

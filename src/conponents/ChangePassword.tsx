@@ -4,6 +4,7 @@ import { sendPasswordResetEmail } from 'firebase/auth';
 import { FormEvent, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { TextFieldRHF } from './common/TextFieldRHF';
 
 const changePasswordFormSchema = z.object({
   email: z
@@ -94,24 +95,10 @@ export const ChangePassword = () => {
         <Box component="h4" sx={{ marginBottom: '20px' }}>
           パスワード変更
         </Box>
-        <Controller
+        <TextFieldRHF<ChangePasswordFormSchemaType>
           control={control}
           name="email"
-          render={({ field }) => (
-            <TextField
-              ref={field.ref}
-              name={field.name}
-              value={field.value}
-              onChange={field.onChange}
-              onBlur={field.onBlur}
-              disabled={field.disabled}
-              label="メールアドレス"
-              variant="standard"
-              fullWidth
-              helperText={errors.email?.message}
-              error={!!errors.email}
-            />
-          )}
+          label="メールアドレス"
         />
 
         <Button

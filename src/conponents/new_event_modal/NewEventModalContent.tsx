@@ -1,31 +1,16 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import Modal from '@mui/material/Modal';
-import {
-  Alert,
-  Button,
-  Snackbar,
-  TextField,
-  TextFieldProps,
-  Typography,
-} from '@mui/material';
+import { Button } from '@mui/material';
 import { z } from 'zod';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import {
   PostEventRequestBody,
   PostEventResponseSuccessBody,
 } from '@/pages/api/events';
-import {
-  DatePicker,
-  DateTimePicker,
-  LocalizationProvider,
-} from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
-import { ja } from 'date-fns/locale/ja';
 import { format } from 'date-fns';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { TextFieldRHF } from '../common/TextFieldRHF';
 import { DatePickerRHF } from '../common/DatePickerRHF';
 
@@ -76,6 +61,7 @@ type Props = {
     }>
   >;
   setIsSnackbarOpen: Dispatch<SetStateAction<boolean>>;
+  getEvents: () => void;
 };
 
 export const NewEventModalContent = ({
@@ -83,6 +69,7 @@ export const NewEventModalContent = ({
   date,
   setSnackbarMessage,
   setIsSnackbarOpen,
+  getEvents,
 }: Props) => {
   const {
     //何を使うか
@@ -116,6 +103,7 @@ export const NewEventModalContent = ({
       member: data.member || null,
       memo: data.memo || null,
     };
+
     axios
       .post<PostEventResponseSuccessBody>('/api/events', postData) //POSTする
       .then(() => {
@@ -123,6 +111,7 @@ export const NewEventModalContent = ({
           severity: 'success',
           text: 'イベント登録完了',
         });
+        getEvents();
         setIsSnackbarOpen(true);
         onClose();
       })

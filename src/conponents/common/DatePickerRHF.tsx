@@ -25,7 +25,9 @@ export const DatePickerRHF = <T extends FieldValues>(props: Props<T>) => {
               value={field.value}
               onChange={field.onChange}
               disabled={field.disabled}
-              format={'MM月dd日 hh:mm'}
+              format={'MM月dd日 HH:mm'}
+              // views={['hours', 'minutes', 'seconds']}
+              ampm={false}
               viewRenderers={{
                 hours: null,
                 minutes: null,

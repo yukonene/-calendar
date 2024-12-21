@@ -3,7 +3,7 @@ import {
   sendEmailVerification,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase/firebaseClient';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useContext, useState } from 'react';
 import { cookieOptions } from '@/constants/cookieOptions';
 import { setCookie } from 'cookies-next';
 import axios from 'axios';
@@ -13,6 +13,9 @@ import { useRouter } from 'next/router';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { TextFieldRHF } from './common/TextFieldRHF';
+import { PostUserRequestBody } from '@/pages/api/users';
+import { FirebaseUserContext } from './common/FirebaseUserProvider';
 
 const registerFormSchema = z
   .object({
@@ -90,7 +93,11 @@ export const Register = () => {
     //   setIsSnackbarErrorOpen(true);
     //   return;
     // }
-
+    const postData = {
+      email: data.email,
+      password: data.password,
+      passwordConfirmation: data.passwordConfirmation,
+    };
     // Firebaseで用意されているユーザー登録の関数
     createUserWithEmailAndPassword(auth, data.email, data.password)
       .then((userCredential) => {
@@ -102,7 +109,7 @@ export const Register = () => {
           .then((token) => {
             setCookie('token', token, cookieOptions); //'key', value, options
             axios
-              .post('/api/users')
+              .post('/api/users', postData)
               .then(() => {
                 sendEmailVerification(user)
                   .then(() => {
@@ -204,64 +211,22 @@ export const Register = () => {
           }}
         >
           <Box component="h4">新規会員登録</Box>
-          <Controller
+          <TextFieldRHF<RegisterFormSchemaType>
             control={control}
             name="email"
-            render={({ field }) => (
-              <TextField
-                ref={field.ref}
-                name={field.name}
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                disabled={field.disabled}
-                label="メールアドレス"
-                variant="standard"
-                fullWidth
-                helperText={errors.email?.message}
-                error={!!errors.email}
-              />
-            )}
+            label="メールアドレス"
           />
-          <Controller
+          <TextFieldRHF<RegisterFormSchemaType>
             control={control}
             name="password"
-            render={({ field }) => (
-              <TextField
-                ref={field.ref}
-                name={field.name}
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                disabled={field.disabled}
-                label="パスワード"
-                type="password"
-                variant="standard"
-                fullWidth
-                helperText={errors.password?.message}
-                error={!!errors.password}
-              />
-            )}
+            label="パスワード"
+            type="password"
           />
-          <Controller
+          <TextFieldRHF<RegisterFormSchemaType>
             control={control}
             name="passwordConfirmation"
-            render={({ field }) => (
-              <TextField
-                ref={field.ref}
-                name={field.name}
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                disabled={field.disabled}
-                label="パスワード確認"
-                type="password"
-                variant="standard"
-                fullWidth
-                helperText={errors.passwordConfirmation?.message}
-                error={!!errors.passwordConfirmation}
-              />
-            )}
+            label="パスワード確認"
+            type="password"
           />
 
           <Button

@@ -7,10 +7,12 @@ import { z } from 'zod';
 
 //jsonの形でresで送ったもののタイプ。number,string,null,boolean
 export type GetEventsResponseSuccessBody = {
-  id: number;
-  title: string;
-  startDateTime: string;
-  endDateTime: string | null;
+  events: {
+    id: number;
+    title: string;
+    startDateTime: string;
+    endDateTime: string | null;
+  }[];
 };
 
 export type PostEventRequestBody = {
@@ -39,12 +41,15 @@ export default async function handler(
   if (!token) {
     //tokenがfalseの場合status401を返す
     res.status(401).json({ error: 'authentication faild' });
+
     return;
   }
 
   try {
     //トークンの検証をする
+
     const decodedToken = await auth.verifyIdToken(token); //トークンの検証に成功したらデータの復号化したデータを返す
+    console.log('token', token);
     const uid = decodedToken.uid; //復号化したデータの中のuidを取り出す
     const isEmailVerified = decodedToken.email_verified;
     const user = await prisma.user.findUnique({

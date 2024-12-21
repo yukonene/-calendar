@@ -9,9 +9,10 @@ type Props = {
   isOpen: boolean;
   onClose: () => void;
   date: Date | undefined;
+  getEvents: () => void;
 };
 
-export const NewEventModal = ({ isOpen, onClose, date }: Props) => {
+export const NewEventModal = ({ isOpen, onClose, date, getEvents }: Props) => {
   const [snackbarMessage, setSnackbarMessage] = useState<{
     severity: 'success' | 'error';
     text: string;
@@ -47,6 +48,7 @@ export const NewEventModal = ({ isOpen, onClose, date }: Props) => {
             date={date}
             setSnackbarMessage={setSnackbarMessage}
             setIsSnackbarOpen={setIsSnackbarOpen}
+            getEvents={getEvents}
           />
         </Modal>
       )}
