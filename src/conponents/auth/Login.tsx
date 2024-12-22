@@ -12,8 +12,8 @@ import { auth } from '@/lib/firebase/firebaseClient';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { TextFieldRHF } from './common/TextFieldRHF';
-import { useFirebaseUserContext } from './common/FirebaseUserProvider';
+import { TextFieldRHF } from '../common/TextFieldRHF';
+import { useFirebaseUserContext } from '../common/FirebaseUserProvider';
 
 const loginFormSchema = z //zod
   .object({

@@ -3,9 +3,11 @@ import { NeneCalendar } from './Calendar';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase/firebaseClient';
 import { useRouter } from 'next/router';
-
+import { Event } from './Event';
 import { useFirebaseUserContext } from './common/FirebaseUserProvider';
 import Link from 'next/link';
+import { useCallback, useState } from 'react';
+import { EventClickArg } from '@fullcalendar/core/index.js';
 
 export const Main = () => {
   const { firebaseUser, setFirebaseUser } = useFirebaseUserContext();
@@ -17,6 +19,10 @@ export const Main = () => {
     console.log('signout');
     router.push('/login');
   };
+
+  const [eventId, setEventId] = useState<number>();
+  console.log(eventId);
+  //イベントページ表示
 
   return (
     <Box //全体の
@@ -33,20 +39,20 @@ export const Main = () => {
         }}
       >
         {/* ログインログアウト切り替え */}
-        {!!firebaseUser ? (
-          <Box sx={{ marginLeft: 'auto' }}>
-            <Button onClick={logout}>ログアウト</Button>
-          </Box>
-        ) : (
-          <Box sx={{ display: 'flex', marginLeft: 'auto', gap: '8px' }}>
-            <Link href="/login" passHref>
-              <Button>ログイン</Button>
-            </Link>
-            <Link href="/register" passHref>
-              <Button>新規会員登録</Button>
-            </Link>
-          </Box>
-        )}
+        {/* {!!firebaseUser ? ( */}
+        <Box sx={{ marginLeft: 'auto' }}>
+          <Button onClick={logout}>ログアウト</Button>
+        </Box>
+        // ) : (
+        <Box sx={{ display: 'flex', marginLeft: 'auto', gap: '8px' }}>
+          <Link href="/login" passHref>
+            <Button>ログイン</Button>
+          </Link>
+          <Link href="/register" passHref>
+            <Button>新規会員登録</Button>
+          </Link>
+        </Box>
+        {/* )} */}
       </Box>
       <Box
         style={{
@@ -55,10 +61,12 @@ export const Main = () => {
         }}
       >
         <Box sx={{ padding: '25px' }}>
-          <NeneCalendar />
+          <NeneCalendar setEventId={setEventId} />
         </Box>
 
-        <Box sx={{ padding: '25px' }}>日ごと</Box>
+        <Box sx={{ padding: '25px' }}>
+          {!!eventId && <Event eventId={eventId} />}
+        </Box>
       </Box>
     </Box>
   );

@@ -3,19 +3,17 @@ import {
   sendEmailVerification,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase/firebaseClient';
-import { FormEvent, useContext, useState } from 'react';
+import { useState } from 'react';
 import { cookieOptions } from '@/constants/cookieOptions';
 import { setCookie } from 'cookies-next';
 import axios from 'axios';
-import { Alert, Box, Button, Snackbar, TextField } from '@mui/material';
+import { Alert, Box, Button, Snackbar } from '@mui/material';
 import { FirebaseError } from 'firebase/app';
 import { useRouter } from 'next/router';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { TextFieldRHF } from './common/TextFieldRHF';
-import { PostUserRequestBody } from '@/pages/api/users';
-import { FirebaseUserContext } from './common/FirebaseUserProvider';
+import { TextFieldRHF } from '../common/TextFieldRHF';
 
 const registerFormSchema = z
   .object({

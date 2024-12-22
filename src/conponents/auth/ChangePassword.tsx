@@ -4,7 +4,7 @@ import { sendPasswordResetEmail } from 'firebase/auth';
 import { FormEvent, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { TextFieldRHF } from './common/TextFieldRHF';
+import { TextFieldRHF } from '../common/TextFieldRHF';
 
 const changePasswordFormSchema = z.object({
   email: z

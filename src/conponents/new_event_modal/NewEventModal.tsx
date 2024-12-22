@@ -18,6 +18,7 @@ export const NewEventModal = ({ isOpen, onClose, date, getEvents }: Props) => {
     text: string;
   }>({ severity: 'error', text: '' });
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
+
   return (
     <>
       <Snackbar

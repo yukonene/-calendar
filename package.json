@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "migrate": "dotenv -e .env.development.local npx prisma migrate dev --preview-feature",
+    "reset": "dotenv -e .env.development.local npx prisma migrate reset",
     "studio": "dotenv -e .env.development.local npx prisma studio"
   },
   "dependencies": {

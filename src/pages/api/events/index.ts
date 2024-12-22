@@ -76,18 +76,20 @@ export default async function handler(
           userId: user.id,
         },
       });
-      const data = events.map((event) => {
-        return {
-          id: event.id,
-          title: event.title,
-          //jsonは文字列の一つの形式の為date型を送れない。
-          // そのためstring型にするが、stringだとSat Dec 14 2024 20:36:06 GMT+0900 (日本標準時)でわかりにくい為、
-          // toISOSting()でISO8601の表示形式にする'2024-12-14T11:36:06.137Z'
-          startDateTime: event.startDateTime.toISOString(),
-          endDateTime: event.endDateTime?.toISOString() || null,
-        };
-      });
-      res.status(200).json({ events: data });
+      const data: GetEventsResponseSuccessBody = {
+        events: events.map((event) => {
+          return {
+            id: event.id,
+            title: event.title,
+            //jsonは文字列の一つの形式の為date型を送れない。
+            // そのためstring型にするが、stringだとSat Dec 14 2024 20:36:06 GMT+0900 (日本標準時)でわかりにくい為、
+            // toISOSting()でISO8601の表示形式にする'2024-12-14T11:36:06.137Z'
+            startDateTime: event.startDateTime.toISOString(),
+            endDateTime: event.endDateTime?.toISOString() || null,
+          };
+        }),
+      };
+      res.status(200).json(data);
 
       // ここからPOST
     } else if (req.method === 'POST') {

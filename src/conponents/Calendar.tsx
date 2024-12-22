@@ -1,28 +1,44 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import allLocales from '@fullcalendar/core/locales-all';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
-
+import { Event } from './Event';
 import { Box } from '@mui/material';
 import axios from 'axios';
 import { NewEventModal } from './new_event_modal/NewEventModal';
 import { GetEventsResponseSuccessBody } from '@/pages/api/events';
+import { EventClickArg } from '@fullcalendar/core/index.js';
 
-export const NeneCalendar = () => {
+type Props = {
+  setEventId: Dispatch<SetStateAction<number | undefined>>;
+};
+
+export const NeneCalendar = ({ setEventId }: Props) => {
   const [isNewEventModalOpen, setIsNewEventModalOpen] = useState(false);
   const [date, setDate] = useState<Date>(); //モーダルに日付データを渡す
 
-  //モーダルopen時
+  //イベント作成モーダルopen時
   const handleDateClick = useCallback((info: DateClickArg) => {
     console.log(info);
     setIsNewEventModalOpen(true);
     setDate(info.date);
   }, []);
-  //モーダルclose時
+  //イベント作成モーダルclose時
   const handleCloseModal = useCallback(() => {
     setIsNewEventModalOpen(false);
     setDate(undefined);
+  }, []);
+
+  const handleEventClick = useCallback((info: EventClickArg) => {
+    setEventId(Number(info.event.id));
   }, []);
 
   const [events, setEvents] = useState<
@@ -78,6 +94,7 @@ export const NeneCalendar = () => {
         }}
         events={eventList}
         dateClick={handleDateClick}
+        eventClick={handleEventClick}
       />
 
       <NewEventModal //イベント登録モーダル

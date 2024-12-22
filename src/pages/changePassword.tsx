@@ -1,4 +1,4 @@
-import { ChangePassword } from '@/conponents/ChangePassword';
+import { ChangePassword } from '@/conponents/auth/ChangePassword';
 
 export default function ChangePasswordPage() {
   return <ChangePassword />;
