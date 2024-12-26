@@ -6,8 +6,7 @@ import { useRouter } from 'next/router';
 import { Event } from './Event';
 import { useFirebaseUserContext } from './common/FirebaseUserProvider';
 import Link from 'next/link';
-import { useCallback, useState } from 'react';
-import { EventClickArg } from '@fullcalendar/core/index.js';
+import { useState } from 'react';
 
 export const Main = () => {
   const { firebaseUser, setFirebaseUser } = useFirebaseUserContext();

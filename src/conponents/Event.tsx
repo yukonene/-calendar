@@ -1,14 +1,8 @@
-import { GetEventResponseSuccessBody } from '@/pages/api/events/[id]';
-import { Box } from '@mui/material';
+import { DeleteEventResponseSuccessBody, GetEventResponseSuccessBody } from '@/pages/api/events/[id]';
+import { Box, Button } from '@mui/material';
 import axios from 'axios';
 import { format } from 'date-fns';
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { EditEventModal } from './edit_event_modal/EditEventModal';
 
 type Props = {
@@ -49,9 +43,37 @@ export const Event = ({ eventId }: Props) => {
   }, [eventId]);
 
   const [editEventModalOpen, SetEditEventModalOpen] = useState(false);
-  useCallback(() => {
+  const handleEditEventClick = useCallback(() => {
     SetEditEventModalOpen(true);
+    setEvent(event);
   }, []);
+  console.log(editEventModalOpen);
+
+  
+
+  axios
+        .delete<DeleteEventResponseSuccessBody>(
+          `/api/events/${eventId}`,
+          deleteData
+        ) //deleteする
+        .then(() => {
+          setSnackbarMessage({
+            severity: 'success',
+            text: 'イベント削除完了',
+          });
+          setIsSnackbarOpen(true);
+          onClose();
+        })
+        .catch((error) => {
+          setSnackbarMessage({
+            severity: 'error',
+            text: 'イベントの削除に失敗しました。',
+          });
+          setIsSnackbarOpen(true);
+        });
+    };
+  
+
 
   return (
     <Box>
@@ -131,6 +153,22 @@ export const Event = ({ eventId }: Props) => {
                 {event.success != null && (event.success ? '成功' : '失敗')}
               </Box>
             </Box>
+
+            <Button
+              variant="contained"
+              sx={{ width: '150px', marginTop: '16px', margin: '8px' }}
+              onClick={handleEditEventClick}
+            >
+              削除
+            </Button>
+
+            <Button
+              variant="contained"
+              sx={{ width: '150px', marginTop: '16px', margin: '8px' }}
+              onClick={handleEditEventClick}
+            >
+              編集
+            </Button>
             <EditEventModal
               event={event}
               isOpen={editEventModalOpen}

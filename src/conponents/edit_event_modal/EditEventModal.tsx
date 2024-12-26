@@ -43,12 +43,7 @@ export const EditEventModal = ({ event, isOpen, onClose, getEvent }: Props) => {
         </Alert>
       </Snackbar>
 
-      <Modal
-        open={isOpen}
-        onClose={onClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
+      <Modal open={isOpen} onClose={onClose}>
         <EditEventModalContent
           event={event}
           onClose={onClose}

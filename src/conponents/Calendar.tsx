@@ -10,7 +10,6 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import allLocales from '@fullcalendar/core/locales-all';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
-import { Event } from './Event';
 import { Box } from '@mui/material';
 import axios from 'axios';
 import { NewEventModal } from './new_event_modal/NewEventModal';

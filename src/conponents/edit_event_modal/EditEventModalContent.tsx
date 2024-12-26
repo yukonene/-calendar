@@ -1,19 +1,23 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import { Button } from '@mui/material';
+import {
+  Button,
+  FormControlLabel,
+  FormLabel,
+  Radio,
+  RadioGroup,
+} from '@mui/material';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
-import {
-  PostEventRequestBody,
-  PostEventResponseSuccessBody,
-} from '@/pages/api/events';
-import { format } from 'date-fns';
 import { Dispatch, SetStateAction } from 'react';
 import { TextFieldRHF } from '../common/TextFieldRHF';
 import { DatePickerRHF } from '../common/DatePickerRHF';
-import { PatchEventRequestBody } from '@/pages/api/events/[id]';
+import {
+  PatchEventRequestBody,
+  PatchEventResponseSuccessBody,
+} from '@/pages/api/events/[id]';
 
 const style = {
   position: 'relative',
@@ -110,7 +114,7 @@ export const EditEventModalContent = ({
   console.log(errors);
 
   const onEditNewEvent = (data: EventSchemaType) => {
-    const postData: PatchEventRequestBody = {
+    const patchData: PatchEventRequestBody = {
       title: data.title,
       startDateTime: data.startDateTime.toISOString(),
       endDateTime: data.endDateTime?.toISOString() || null,
@@ -123,20 +127,23 @@ export const EditEventModalContent = ({
     };
 
     axios
-      .post<PostEventResponseSuccessBody>('/api/events', postData) //POSTする
+      .patch<PatchEventResponseSuccessBody>(
+        `/api/events/${event.id}`,
+        patchData
+      ) //patchする
       .then(() => {
         setSnackbarMessage({
           severity: 'success',
-          text: 'イベント登録完了',
+          text: 'イベント編集完了',
         });
-        getEvents();
+        getEvent();
         setIsSnackbarOpen(true);
         onClose();
       })
       .catch((error) => {
         setSnackbarMessage({
           severity: 'error',
-          text: 'イベントの登録に失敗しました。',
+          text: 'イベントの編集に失敗しました。',
         });
         setIsSnackbarOpen(true);
       });
@@ -153,11 +160,9 @@ export const EditEventModalContent = ({
           alignItems: 'center',
         }}
       >
-        <Box component="h3">{format(date, ' MM月dd日')}</Box>
-
         <Box
           component="form"
-          onSubmit={handleSubmit(onCreateNewEvent)}
+          onSubmit={handleSubmit(onEditNewEvent)}
           sx={{
             display: 'flex',
             flexDirection: 'column',
@@ -184,7 +189,7 @@ export const EditEventModalContent = ({
               control={control}
               label="開催日時"
             />
-            <Box>-</Box>
+            <Box> ~ </Box>
             <DatePickerRHF<EventSchemaType>
               name="endDateTime"
               control={control}
@@ -212,6 +217,41 @@ export const EditEventModalContent = ({
             name="memo"
             label="詳細memo"
           />
+
+          <TextFieldRHF<EventSchemaType>
+            control={control}
+            name="diary"
+            label="イベントレポート"
+          />
+
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: '16px',
+            }}
+          >
+            <FormLabel id="success">脱出 </FormLabel>
+            <RadioGroup
+              row
+              aria-labelledby="demo-row-radio-buttons-group-label"
+              name="success"
+            >
+              <FormControlLabel
+                value="true"
+                control={<Radio />}
+                label="成功!!"
+                sx={{ color: '#0066CC' }}
+              />
+              <FormControlLabel
+                value="false"
+                control={<Radio />}
+                label="失敗"
+                sx={{ color: '#FF9872' }}
+              />
+            </RadioGroup>
+          </Box>
           <Box
             sx={{
               display: 'flex',
@@ -237,7 +277,7 @@ export const EditEventModalContent = ({
               variant="contained"
               sx={{ width: '150px', marginTop: '16px', margin: '8px' }}
             >
-              登録
+              編集
             </Button>
           </Box>
         </Box>

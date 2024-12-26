@@ -20,6 +20,10 @@ export type GetEventResponseSuccessBody = {
   };
 };
 
+export type PatchEventResponseSuccessBody = '';
+
+export type DeleteEventResponseSuccessBody = '';
+
 export type PatchEventRequestBody = {
   title: string;
   startDateTime: string;
@@ -116,6 +120,64 @@ export default async function handler(
       };
       res.status(200).json(data);
     } else if (req.method === 'PATCH') {
+      const body = req.body as PatchEventRequestBody;
+      const rawData = {
+        title: body.title,
+        startDateTime: new Date(body.startDateTime),
+        endDateTime: !!body.endDateTime ? new Date(body.endDateTime) : null,
+        place: body.place,
+        url: body.url,
+        member: body.member,
+        memo: body.memo,
+        diary: body.diary,
+        success: body.success,
+        userId: user.id,
+      };
+      const eventScheme = z
+        .object({
+          title: z
+            .string()
+            .min(1, { message: 'イベントタイトルを入力してください' })
+            .max(50, { message: 'イベントタイトルが長すぎます' }),
+          startDateTime: z.date(),
+          endDateTime: z.date().nullable(), //nullかも
+          place: z.string().max(100, { message: '文字数超過' }).nullable(),
+          url: z.string().max(200, { message: '文字数超過' }).nullable(),
+          member: z.string().max(100, { message: '文字数超過' }).nullable(),
+          memo: z.string().max(255, { message: '文字数超過' }).nullable(),
+          diary: z.string().max(10000, { message: '文字数超過' }).nullable(),
+          success: z.boolean().nullable(),
+          userId: z.number(),
+        })
+        .refine(
+          //終了日時がnull、もしくは終了時刻が開始日時より後の場合正しい入力値とする。
+          (data) => !data.endDateTime || data.startDateTime <= data.endDateTime,
+          {
+            message: '終了日時は開始日時の後に設定してください',
+            path: ['endDateTime'],
+          }
+        );
+      const result = eventScheme.safeParse(rawData);
+      if (!result.success) {
+        res.status(422).json({ error: '入力を間違えています' });
+        return;
+      }
+      const editData = result.data;
+      await prisma.event.update({
+        where: {
+          id: event.id,
+        },
+        data: editData,
+      });
+
+      res.status(200).end();
+    } else if (req.method === 'DELETE') {
+      await prisma.event.delete({
+        where: {
+          id: event.id,
+        },
+      });
+      res.status(200).end();
     }
   } catch (error) {
     res.status(500).json({ error: 'Failed to register' }); //例外なエラーが発生した時500をresする

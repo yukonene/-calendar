@@ -135,7 +135,7 @@ export default async function handler(
         return;
       }
       const data = result.data;
-      const event = await prisma.event.create({
+      await prisma.event.create({
         data: data,
       });
       res.status(200).end();
