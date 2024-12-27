@@ -1,20 +1,10 @@
 import { Alert, Modal, Snackbar } from '@mui/material';
 import { useState } from 'react';
 import { EditEventModalContent } from './EditEventModalContent';
+import { EventT } from '@/types/EventT';
 
 type Props = {
-  event: {
-    id: number;
-    title: string;
-    startDateTime: string;
-    endDateTime: string | null;
-    place: string | null;
-    url: string | null;
-    member: string | null;
-    memo: string | null;
-    diary: string | null;
-    success: true | null;
-  };
+  event: EventT;
   isOpen: boolean;
   onClose: () => void;
   getEvent: () => void;

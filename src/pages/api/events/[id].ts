@@ -4,20 +4,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '@/lib/prisma';
 import { auth } from '@/lib/firebase/firebaseAdminClient';
 import { z } from 'zod';
+import { EventT } from '@/types/EventT';
 
 export type GetEventResponseSuccessBody = {
-  event: {
-    id: number;
-    title: string;
-    startDateTime: string;
-    endDateTime: string | null;
-    place: string | null;
-    url: string | null;
-    member: string | null;
-    memo: string | null;
-    diary: string | null;
-    success: true | null;
-  };
+  event: EventT;
 };
 
 export type PatchEventResponseSuccessBody = '';

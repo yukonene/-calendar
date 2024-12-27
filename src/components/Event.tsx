@@ -15,8 +15,8 @@ import axios from 'axios';
 import { format } from 'date-fns';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { EditEventModal } from './edit_event_modal/EditEventModal';
-import { GetEventsResponseSuccessBody } from '@/pages/api/events';
 import { useEventsContext } from './EventsProvider';
+import { EventT } from '@/types/EventT';
 
 type Props = {
   eventId: number | undefined;
@@ -24,18 +24,7 @@ type Props = {
 
 export const Event = ({ eventId }: Props) => {
   const { getEvents } = useEventsContext();
-  const [event, setEvent] = useState<{
-    id: number;
-    title: string;
-    startDateTime: string;
-    endDateTime: string | null;
-    place: string | null;
-    url: string | null;
-    member: string | null;
-    memo: string | null;
-    diary: string | null;
-    success: true | null;
-  }>();
+  const [event, setEvent] = useState<EventT>();
 
   const getEvent = useCallback(() => {
     if (!eventId) {
