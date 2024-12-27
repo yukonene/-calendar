@@ -1,9 +1,23 @@
-import { DeleteEventResponseSuccessBody, GetEventResponseSuccessBody } from '@/pages/api/events/[id]';
-import { Box, Button } from '@mui/material';
+import {
+  DeleteEventResponseSuccessBody,
+  GetEventResponseSuccessBody,
+} from '@/pages/api/events/[id]';
+import {
+  Alert,
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Snackbar,
+} from '@mui/material';
 import axios from 'axios';
 import { format } from 'date-fns';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { EditEventModal } from './edit_event_modal/EditEventModal';
+import { GetEventsResponseSuccessBody } from '@/pages/api/events';
 
 type Props = {
   eventId: number | undefined;
@@ -22,6 +36,7 @@ export const Event = ({ eventId }: Props) => {
     diary: string | null;
     success: true | null;
   }>();
+
   const getEvent = useCallback(() => {
     if (!eventId) {
       return;
@@ -49,20 +64,56 @@ export const Event = ({ eventId }: Props) => {
   }, []);
   console.log(editEventModalOpen);
 
-  
+  const [snackbarMessage, setSnackbarMessage] = useState<{
+    severity: 'success' | 'error';
+    text: string;
+  }>({ severity: 'error', text: '' });
+  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
 
-  axios
-        .delete<DeleteEventResponseSuccessBody>(
-          `/api/events/${eventId}`,
-          deleteData
-        ) //deleteする
+  const [events, setEvents] = useState<
+    {
+      id: number;
+      title: string;
+      startDateTime: string;
+      endDateTime: string | null;
+    }[]
+  >([]);
+  const eventList = useMemo(() => {
+    return events.map((event) => {
+      return {
+        id: event.id.toString(), //typeを文字列に変換
+        title: event.title,
+        start: new Date(event.startDateTime),
+        end: !!event.endDateTime ? new Date(event.endDateTime) : undefined,
+      };
+    });
+  }, [events]);
+  const getEvents = useCallback(() => {
+    //基本的にはusecallbackつける
+    axios
+      .get<GetEventsResponseSuccessBody>('/api/events/')
+      .then((res) => {
+        setEvents(res.data.events); //GetEventsResponseSuccessBody=res.data
+      })
+
+      .catch((e) => {
+        console.log(e.message);
+      });
+  }, []);
+  const deleteEvent = useCallback(() => {
+    if (!eventId) {
+      return;
+    } else {
+      axios
+        .delete<DeleteEventResponseSuccessBody>(`/api/events/${eventId}`) //deleteする
         .then(() => {
           setSnackbarMessage({
             severity: 'success',
             text: 'イベント削除完了',
           });
           setIsSnackbarOpen(true);
-          onClose();
+          getEvents();
+          handleClose();
         })
         .catch((error) => {
           setSnackbarMessage({
@@ -71,9 +122,17 @@ export const Event = ({ eventId }: Props) => {
           });
           setIsSnackbarOpen(true);
         });
-    };
-  
+    }
+  }, [eventId]);
+  const [open, setOpen] = useState(false);
 
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   return (
     <Box>
@@ -159,16 +218,39 @@ export const Event = ({ eventId }: Props) => {
               sx={{ width: '150px', marginTop: '16px', margin: '8px' }}
               onClick={handleEditEventClick}
             >
-              削除
-            </Button>
-
-            <Button
-              variant="contained"
-              sx={{ width: '150px', marginTop: '16px', margin: '8px' }}
-              onClick={handleEditEventClick}
-            >
               編集
             </Button>
+            <Box>
+              <Button
+                variant="contained"
+                sx={{
+                  width: '150px',
+                  marginTop: '16px',
+                  margin: '8px',
+                  backgroundColor: 'gray',
+                }}
+                onClick={handleClickOpen}
+              >
+                削除
+              </Button>
+              <Dialog
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+              >
+                <DialogTitle id="alert-dialog-title">
+                  {'削除してもよろしいですか？'}
+                </DialogTitle>
+
+                <DialogActions>
+                  <Button onClick={handleClose}>いいえ</Button>
+                  <Button onClick={deleteEvent} autoFocus>
+                    はい
+                  </Button>
+                </DialogActions>
+              </Dialog>
+            </Box>
             <EditEventModal
               event={event}
               isOpen={editEventModalOpen}
@@ -178,6 +260,20 @@ export const Event = ({ eventId }: Props) => {
           </Box>
         ) : null}
       </Box>
+      <Snackbar
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        open={isSnackbarOpen}
+        onClose={() => setIsSnackbarOpen(false)}
+      >
+        <Alert
+          onClose={() => setIsSnackbarOpen(false)}
+          severity={snackbarMessage.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbarMessage.text}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
