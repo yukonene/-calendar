@@ -8,8 +8,6 @@ import {
   Button,
   Dialog,
   DialogActions,
-  DialogContent,
-  DialogContentText,
   DialogTitle,
   Snackbar,
 } from '@mui/material';
@@ -18,12 +16,14 @@ import { format } from 'date-fns';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { EditEventModal } from './edit_event_modal/EditEventModal';
 import { GetEventsResponseSuccessBody } from '@/pages/api/events';
+import { useEventsContext } from './EventsProvider';
 
 type Props = {
   eventId: number | undefined;
 };
 
 export const Event = ({ eventId }: Props) => {
+  const { getEvents } = useEventsContext();
   const [event, setEvent] = useState<{
     id: number;
     title: string;
@@ -55,13 +55,13 @@ export const Event = ({ eventId }: Props) => {
 
   useEffect(() => {
     getEvent();
-  }, [eventId]);
+  }, [eventId, getEvent]);
 
   const [editEventModalOpen, SetEditEventModalOpen] = useState(false);
   const handleEditEventClick = useCallback(() => {
     SetEditEventModalOpen(true);
     setEvent(event);
-  }, []);
+  }, [setEvent, event]);
   console.log(editEventModalOpen);
 
   const [snackbarMessage, setSnackbarMessage] = useState<{
@@ -70,60 +70,30 @@ export const Event = ({ eventId }: Props) => {
   }>({ severity: 'error', text: '' });
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
 
-  const [events, setEvents] = useState<
-    {
-      id: number;
-      title: string;
-      startDateTime: string;
-      endDateTime: string | null;
-    }[]
-  >([]);
-  const eventList = useMemo(() => {
-    return events.map((event) => {
-      return {
-        id: event.id.toString(), //typeを文字列に変換
-        title: event.title,
-        start: new Date(event.startDateTime),
-        end: !!event.endDateTime ? new Date(event.endDateTime) : undefined,
-      };
-    });
-  }, [events]);
-  const getEvents = useCallback(() => {
-    //基本的にはusecallbackつける
-    axios
-      .get<GetEventsResponseSuccessBody>('/api/events/')
-      .then((res) => {
-        setEvents(res.data.events); //GetEventsResponseSuccessBody=res.data
-      })
-
-      .catch((e) => {
-        console.log(e.message);
-      });
-  }, []);
   const deleteEvent = useCallback(() => {
-    if (!eventId) {
-      return;
-    } else {
-      axios
-        .delete<DeleteEventResponseSuccessBody>(`/api/events/${eventId}`) //deleteする
-        .then(() => {
-          setSnackbarMessage({
-            severity: 'success',
-            text: 'イベント削除完了',
-          });
-          setIsSnackbarOpen(true);
-          getEvents();
-          handleClose();
-        })
-        .catch((error) => {
-          setSnackbarMessage({
-            severity: 'error',
-            text: 'イベントの削除に失敗しました。',
-          });
-          setIsSnackbarOpen(true);
+    if (!eventId) return;
+
+    axios
+      .delete<DeleteEventResponseSuccessBody>(`/api/events/${eventId}`) //deleteする
+      .then(() => {
+        setSnackbarMessage({
+          severity: 'success',
+          text: 'イベント削除完了',
         });
-    }
-  }, [eventId]);
+        getEvents();
+        setEvent(undefined);
+        setIsSnackbarOpen(true);
+        handleClose();
+      })
+      .catch((error) => {
+        setSnackbarMessage({
+          severity: 'error',
+          text: 'イベントの削除に失敗しました。',
+        });
+        setIsSnackbarOpen(true);
+      });
+  }, [eventId, getEvents]);
+
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {

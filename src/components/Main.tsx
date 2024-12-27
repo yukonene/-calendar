@@ -1,6 +1,5 @@
 import { Box, Button } from '@mui/material';
 import { NeneCalendar } from './Calendar';
-import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase/firebaseClient';
 import { useRouter } from 'next/router';
 import { Event } from './Event';
@@ -42,7 +41,7 @@ export const Main = () => {
         <Box sx={{ marginLeft: 'auto' }}>
           <Button onClick={logout}>ログアウト</Button>
         </Box>
-        // ) : (
+        {/* ) : ( */}
         <Box sx={{ display: 'flex', marginLeft: 'auto', gap: '8px' }}>
           <Link href="/login" passHref>
             <Button>ログイン</Button>

@@ -2,7 +2,6 @@ import {
   Dispatch,
   SetStateAction,
   useCallback,
-  useEffect,
   useMemo,
   useState,
 } from 'react';
@@ -11,16 +10,16 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import allLocales from '@fullcalendar/core/locales-all';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import { Box } from '@mui/material';
-import axios from 'axios';
 import { NewEventModal } from './new_event_modal/NewEventModal';
-import { GetEventsResponseSuccessBody } from '@/pages/api/events';
 import { EventClickArg } from '@fullcalendar/core/index.js';
+import { useEventsContext } from './EventsProvider';
 
 type Props = {
   setEventId: Dispatch<SetStateAction<number | undefined>>;
 };
 
 export const NeneCalendar = ({ setEventId }: Props) => {
+  const { events } = useEventsContext();
   const [isNewEventModalOpen, setIsNewEventModalOpen] = useState(false);
   const [date, setDate] = useState<Date>(); //モーダルに日付データを渡す
 
@@ -36,18 +35,12 @@ export const NeneCalendar = ({ setEventId }: Props) => {
     setDate(undefined);
   }, []);
 
-  const handleEventClick = useCallback((info: EventClickArg) => {
-    setEventId(Number(info.event.id));
-  }, []);
-
-  const [events, setEvents] = useState<
-    {
-      id: number;
-      title: string;
-      startDateTime: string;
-      endDateTime: string | null;
-    }[]
-  >([]);
+  const handleEventClick = useCallback(
+    (info: EventClickArg) => {
+      setEventId(Number(info.event.id));
+    },
+    [setEventId]
+  );
 
   const eventList = useMemo(() => {
     return events.map((event) => {
@@ -60,23 +53,6 @@ export const NeneCalendar = ({ setEventId }: Props) => {
     });
   }, [events]);
 
-  const getEvents = useCallback(() => {
-    //基本的にはusecallbackつける
-    axios
-      .get<GetEventsResponseSuccessBody>('/api/events/')
-      .then((res) => {
-        setEvents(res.data.events); //GetEventsResponseSuccessBody=res.data
-      })
-
-      .catch((e) => {
-        console.log(e.message);
-      });
-  }, []);
-
-  useEffect(() => {
-    //初回レンダリング時にイベントデータを取って来る
-    getEvents();
-  }, []);
   return (
     <Box sx={{ minWidth: '50vw' }}>
       <FullCalendar
@@ -100,7 +76,6 @@ export const NeneCalendar = ({ setEventId }: Props) => {
         isOpen={isNewEventModalOpen}
         onClose={handleCloseModal}
         date={date}
-        getEvents={getEvents}
       />
     </Box>
   );

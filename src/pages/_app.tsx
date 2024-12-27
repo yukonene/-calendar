@@ -1,4 +1,4 @@
-import { FirebaseUserProvider } from '@/conponents/common/FirebaseUserProvider';
+import { FirebaseUserProvider } from '@/components/common/FirebaseUserProvider';
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
 

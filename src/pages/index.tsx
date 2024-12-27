@@ -1,5 +1,10 @@
-import { Main } from '@/conponents/Main';
+import { EventsProvider } from '@/components/EventsProvider';
+import { Main } from '@/components/Main';
 
 export default function HomePage() {
-  return <Main />;
+  return (
+    <EventsProvider>
+      <Main />;
+    </EventsProvider>
+  );
 }

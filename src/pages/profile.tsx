@@ -1,8 +1,5 @@
-import { Profile } from "@/conponents/Profile";
+import { Profile } from '@/components/Profile';
 
 export default function ProfilePage() {
-    return (
-      <Profile/>
-    );
-  }
-  
+  return <Profile />;
+}

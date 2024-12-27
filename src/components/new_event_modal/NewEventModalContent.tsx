@@ -13,6 +13,7 @@ import { format } from 'date-fns';
 import { Dispatch, SetStateAction } from 'react';
 import { TextFieldRHF } from '../common/TextFieldRHF';
 import { DatePickerRHF } from '../common/DatePickerRHF';
+import { useEventsContext } from '../EventsProvider';
 
 const style = {
   position: 'relative',
@@ -61,7 +62,6 @@ type Props = {
     }>
   >;
   setIsSnackbarOpen: Dispatch<SetStateAction<boolean>>;
-  getEvents: () => void;
 };
 
 export const NewEventModalContent = ({
@@ -69,8 +69,8 @@ export const NewEventModalContent = ({
   date,
   setSnackbarMessage,
   setIsSnackbarOpen,
-  getEvents,
 }: Props) => {
+  const { getEvents } = useEventsContext();
   const {
     //何を使うか
     control,

@@ -1,4 +1,4 @@
-import { useFirebaseUserContext } from '@/conponents/common/FirebaseUserProvider';
+import { useFirebaseUserContext } from '@/components/common/FirebaseUserProvider';
 import { cookieOptions } from '@/constants/cookieOptions';
 import { auth } from '@/lib/firebase/firebaseClient';
 import { deleteCookie, setCookie } from 'cookies-next';
@@ -28,7 +28,7 @@ export default function Document() {
       //return以下が関数の場合、conponentが消滅する際に実行される
       unsubscribed();
     };
-  }, []);
+  }, [setFirebaseUser]);
   return (
     <Html lang="en">
       <Head />
