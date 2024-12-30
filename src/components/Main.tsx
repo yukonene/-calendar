@@ -29,6 +29,7 @@ export const Main = () => {
         flexDirection: 'column',
       }}
     >
+      {/* トップバー */}
       <Box
         sx={{
           display: 'flex',
@@ -51,18 +52,23 @@ export const Main = () => {
           </Link>
         </Box>
         {/* )} */}
+        <Link href="/profile" passHref>
+          <Button>プロフィール</Button>
+        </Link>
       </Box>
+      {/* メインコンテンツ */}
       <Box
         style={{
           display: 'flex',
           flexDirection: 'row',
         }}
       >
-        <Box sx={{ padding: '25px' }}>
+        {/* カレンダー */}
+        <Box sx={{ padding: '25px', width: '50%' }}>
           <NeneCalendar setEventId={setEventId} />
         </Box>
-
-        <Box sx={{ padding: '25px' }}>
+        {/* イベント詳細 */}
+        <Box sx={{ padding: '25px', width: '50%' }}>
           {!!eventId && <Event eventId={eventId} />}
         </Box>
       </Box>

@@ -14,6 +14,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { TextFieldRHF } from '../common/TextFieldRHF';
+import { useSnackbarContext } from '../common/SnackbarProvider';
 
 const registerFormSchema = z
   .object({
@@ -42,6 +43,8 @@ const registerFormSchema = z
 type RegisterFormSchemaType = z.infer<typeof registerFormSchema>;
 
 export const Register = () => {
+  const { setSnackbarMessage, setIsSnackbarOpen } = useSnackbarContext();
+
   // useStateでユーザーが入力したメールアドレスとパスワードをemailとpasswordに格納する
   // const [email, setEmail] = useState('');
   // const [password, setPassword] = useState('');
@@ -69,11 +72,6 @@ export const Register = () => {
     },
   });
   console.log(errors);
-  const [snackbarError, setSnackbarError] = useState<{
-    severity: 'success' | 'error';
-    text: string;
-  }>({ severity: 'error', text: '' });
-  const [isSnackbarErrorOpen, setIsSnackbarErrorOpen] = useState(false);
 
   const router = useRouter();
 
@@ -107,7 +105,7 @@ export const Register = () => {
           .then((token) => {
             setCookie('token', token, cookieOptions); //'key', value, options
             axios
-              .post('/api/users', postData)
+              .post('/api/user', postData)
               .then(() => {
                 sendEmailVerification(user)
                   .then(() => {
@@ -117,21 +115,21 @@ export const Register = () => {
                   }) //↓ここからエラー文
                   .catch((error) => {
                     console.log('確認メールの送信に失敗しました。');
-                    setSnackbarError({
+                    setSnackbarMessage({
                       severity: 'error',
                       text: '確認メールの送信に失敗しました。',
                     });
-                    setIsSnackbarErrorOpen(true);
+                    setIsSnackbarOpen(true);
                   });
               })
               .catch((error) => {
                 //サーバー側で発生したエラーをキャッチして、snackbarにエラー文載せて表示
                 console.log(error);
-                setSnackbarError({
+                setSnackbarMessage({
                   severity: 'error',
                   text: error.response.data.error,
                 });
-                setIsSnackbarErrorOpen(true);
+                setIsSnackbarOpen(true);
               });
           });
       })
@@ -142,18 +140,18 @@ export const Register = () => {
           console.log(JSON.stringify(error));
           if (error.code === 'auth/email-already-in-use') {
             // do something
-            setSnackbarError({
+            setSnackbarMessage({
               severity: 'error',
               text: 'すでに登録されているメールアドレスです。',
             });
-            setIsSnackbarErrorOpen(true);
+            setIsSnackbarOpen(true);
           }
         } else {
-          setSnackbarError({
+          setSnackbarMessage({
             severity: 'error',
             text: 'アカウントの作成に失敗しました。',
           });
-          setIsSnackbarErrorOpen(true);
+          setIsSnackbarOpen(true);
           console.log(JSON.stringify(error));
         }
       });
@@ -168,20 +166,6 @@ export const Register = () => {
         justifyContent: 'center',
       }}
     >
-      <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        open={isSnackbarErrorOpen}
-        onClose={() => setIsSnackbarErrorOpen(false)}
-      >
-        <Alert
-          onClose={() => setIsSnackbarErrorOpen(false)}
-          severity={snackbarError.severity}
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {snackbarError.text}
-        </Alert>
-      </Snackbar>
       <Box
         sx={{
           display: 'flex',

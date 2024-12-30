@@ -23,7 +23,7 @@ export type PatchEventRequestBody = {
   member: string | null;
   memo: string | null;
   diary: string | null;
-  success: true | null;
+  success: boolean | null;
 };
 
 export default async function handler(

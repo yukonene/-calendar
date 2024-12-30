@@ -1,7 +1,7 @@
-import { Alert, Modal, Snackbar } from '@mui/material';
-import { useState } from 'react';
-import { EditEventModalContent } from './EditEventModalContent';
+import { Dialog } from '@mui/material';
+import { EditEventDialogContent } from './EditEventDialogContent';
 import { EventT } from '@/types/EventT';
+import { useSnackbarContext } from '../common/SnackbarProvider';
 
 type Props = {
   event: EventT;
@@ -10,14 +10,17 @@ type Props = {
   getEvent: () => void;
 };
 
-export const EditEventModal = ({ event, isOpen, onClose, getEvent }: Props) => {
-  const [snackbarMessage, setSnackbarMessage] = useState<{
-    severity: 'success' | 'error';
-    text: string;
-  }>({ severity: 'error', text: '' });
-  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
+export const EditEventDialog = ({
+  event,
+  isOpen,
+  onClose,
+  getEvent,
+}: Props) => {
+  const { setSnackbarMessage, setIsSnackbarOpen } = useSnackbarContext();
+
   return (
     <>
+      {/* useSnackbarContextを使っている為不要
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         open={isSnackbarOpen}
@@ -31,17 +34,17 @@ export const EditEventModal = ({ event, isOpen, onClose, getEvent }: Props) => {
         >
           {snackbarMessage.text}
         </Alert>
-      </Snackbar>
+      </Snackbar> */}
 
-      <Modal open={isOpen} onClose={onClose}>
-        <EditEventModalContent
+      <Dialog open={isOpen} onClose={onClose}>
+        <EditEventDialogContent
           event={event}
           onClose={onClose}
           getEvent={getEvent}
           setSnackbarMessage={setSnackbarMessage}
           setIsSnackbarOpen={setIsSnackbarOpen}
         />
-      </Modal>
+      </Dialog>
     </>
   );
 };

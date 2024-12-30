@@ -8,5 +8,5 @@ export type EventT = {
   member: string | null;
   memo: string | null;
   diary: string | null;
-  success: true | null;
+  success: boolean | null;
 };

@@ -1,19 +1,24 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import { Button } from '@mui/material';
+import {
+  Button,
+  FormControlLabel,
+  FormLabel,
+  Radio,
+  RadioGroup,
+} from '@mui/material';
 import { z } from 'zod';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
-import {
-  PostEventRequestBody,
-  PostEventResponseSuccessBody,
-} from '@/pages/api/events';
-import { format } from 'date-fns';
 import { Dispatch, SetStateAction } from 'react';
 import { TextFieldRHF } from '../common/TextFieldRHF';
 import { DatePickerRHF } from '../common/DatePickerRHF';
-import { useEventsContext } from '../EventsProvider';
+import {
+  PatchEventRequestBody,
+  PatchEventResponseSuccessBody,
+} from '@/pages/api/events/[id]';
+import { EventT } from '@/types/EventT';
 
 const style = {
   position: 'relative',
@@ -41,6 +46,10 @@ const eventScheme = z
     url: z.string().max(200, { message: '文字数超過' }).nullable(),
     member: z.string().max(100, { message: '文字数超過' }).nullable(),
     memo: z.string().max(255, { message: '文字数超過' }).nullable(),
+    diary: z.string().max(10000, { message: '文字数超過' }).nullable(),
+    success: z.union([z.literal('true'), z.literal('false')]).nullable(),
+    //literal・・・文字通りの　union・・・orの意味　typescriptの|
+    //radiocomponentでvalueがstringのみ使用可能だった為、一度string型に。
   })
   .refine(
     //終了日時がnull、もしくは(||)終了時刻が開始日時より後の場合正しい入力値とする。
@@ -54,23 +63,24 @@ type EventSchemaType = z.infer<typeof eventScheme>;
 
 type Props = {
   onClose: () => void;
-  date: Date;
+  event: EventT;
+  getEvent: () => void;
+  setIsSnackbarOpen: Dispatch<SetStateAction<boolean>>;
   setSnackbarMessage: Dispatch<
     SetStateAction<{
       severity: 'success' | 'error';
       text: string;
     }>
   >;
-  setIsSnackbarOpen: Dispatch<SetStateAction<boolean>>;
 };
 
-export const NewEventModalContent = ({
+export const EditEventDialogContent = ({
   onClose,
-  date,
+  event,
+  getEvent,
   setSnackbarMessage,
   setIsSnackbarOpen,
 }: Props) => {
-  const { getEvents } = useEventsContext();
   const {
     //何を使うか
     control,
@@ -82,19 +92,25 @@ export const NewEventModalContent = ({
     mode: 'onSubmit',
     criteriaMode: 'all',
     defaultValues: {
-      title: '',
-      startDateTime: date,
-      endDateTime: null,
-      place: '',
-      url: '',
-      member: '',
-      memo: '',
+      title: event.title,
+      startDateTime: new Date(event.startDateTime),
+      endDateTime: event.endDateTime ? new Date(event.endDateTime) : null,
+      place: event.place,
+      url: event.url,
+      member: event.member,
+      memo: event.memo,
+      diary: event.diary,
+      //boolean型に戻した↓
+      success:
+        event.success === null
+          ? null
+          : (event.success.toString() as 'true' | 'false'),
     },
   });
   console.log(errors);
 
-  const onCreateNewEvent = (data: EventSchemaType) => {
-    const postData: PostEventRequestBody = {
+  const onEditNewEvent = (data: EventSchemaType) => {
+    const patchData: PatchEventRequestBody = {
       title: data.title,
       startDateTime: data.startDateTime.toISOString(),
       endDateTime: data.endDateTime?.toISOString() || null,
@@ -102,23 +118,29 @@ export const NewEventModalContent = ({
       url: data.url || null,
       member: data.member || null,
       memo: data.memo || null,
+      diary: data.diary || null,
+      success:
+        data.success === null ? null : data.success === 'true' ? true : false,
     };
 
     axios
-      .post<PostEventResponseSuccessBody>('/api/events', postData) //POSTする
+      .patch<PatchEventResponseSuccessBody>(
+        `/api/events/${event.id}`,
+        patchData
+      ) //patchする
       .then(() => {
         setSnackbarMessage({
           severity: 'success',
-          text: 'イベント登録完了',
+          text: 'イベント編集完了',
         });
-        getEvents();
+        getEvent();
         setIsSnackbarOpen(true);
         onClose();
       })
       .catch((error) => {
         setSnackbarMessage({
           severity: 'error',
-          text: 'イベントの登録に失敗しました。',
+          text: 'イベントの編集に失敗しました。',
         });
         setIsSnackbarOpen(true);
       });
@@ -135,11 +157,9 @@ export const NewEventModalContent = ({
           alignItems: 'center',
         }}
       >
-        <Box component="h3">{format(date, ' MM月dd日')}</Box>
-
         <Box
           component="form"
-          onSubmit={handleSubmit(onCreateNewEvent)}
+          onSubmit={handleSubmit(onEditNewEvent)}
           sx={{
             display: 'flex',
             flexDirection: 'column',
@@ -166,7 +186,7 @@ export const NewEventModalContent = ({
               control={control}
               label="開催日時"
             />
-            <Box>-</Box>
+            <Box> ~ </Box>
             <DatePickerRHF<EventSchemaType>
               name="endDateTime"
               control={control}
@@ -194,6 +214,53 @@ export const NewEventModalContent = ({
             name="memo"
             label="詳細memo"
           />
+
+          <TextFieldRHF<EventSchemaType>
+            control={control}
+            name="diary"
+            label="イベントレポート"
+          />
+
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: '16px',
+            }}
+          >
+            <FormLabel id="success">脱出 </FormLabel>
+            <Controller
+              control={control}
+              name="success"
+              render={({ field }) => (
+                <RadioGroup
+                  ref={field.ref}
+                  row
+                  aria-labelledby="radio-buttons-group-label"
+                  name={field.name}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    console.log(e);
+                  }}
+                  value={field.value}
+                >
+                  <FormControlLabel
+                    value="true"
+                    control={<Radio disabled={field.disabled} />}
+                    label="成功!!"
+                    sx={{ color: '#0066CC' }}
+                  />
+                  <FormControlLabel
+                    value="false"
+                    control={<Radio disabled={field.disabled} />}
+                    label="失敗"
+                    sx={{ color: '#FF9872' }}
+                  />
+                </RadioGroup>
+              )}
+            />
+          </Box>
           <Box
             sx={{
               display: 'flex',
@@ -219,7 +286,7 @@ export const NewEventModalContent = ({
               variant="contained"
               sx={{ width: '150px', marginTop: '16px', margin: '8px' }}
             >
-              登録
+              編集
             </Button>
           </Box>
         </Box>

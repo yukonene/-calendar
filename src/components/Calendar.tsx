@@ -10,7 +10,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import allLocales from '@fullcalendar/core/locales-all';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import { Box } from '@mui/material';
-import { NewEventModal } from './new_event_modal/NewEventModal';
+import { NewEventDialog } from './new_event_dialog/NewEventDialog';
 import { EventClickArg } from '@fullcalendar/core/index.js';
 import { useEventsContext } from './EventsProvider';
 
@@ -20,18 +20,18 @@ type Props = {
 
 export const NeneCalendar = ({ setEventId }: Props) => {
   const { events } = useEventsContext();
-  const [isNewEventModalOpen, setIsNewEventModalOpen] = useState(false);
+  const [isNewEventDialogOpen, setIsNewEventDialogOpen] = useState(false);
   const [date, setDate] = useState<Date>(); //モーダルに日付データを渡す
 
   //イベント作成モーダルopen時
   const handleDateClick = useCallback((info: DateClickArg) => {
     console.log(info);
-    setIsNewEventModalOpen(true);
+    setIsNewEventDialogOpen(true);
     setDate(info.date);
   }, []);
   //イベント作成モーダルclose時
-  const handleCloseModal = useCallback(() => {
-    setIsNewEventModalOpen(false);
+  const handleCloseDialog = useCallback(() => {
+    setIsNewEventDialogOpen(false);
     setDate(undefined);
   }, []);
 
@@ -54,7 +54,7 @@ export const NeneCalendar = ({ setEventId }: Props) => {
   }, [events]);
 
   return (
-    <Box sx={{ minWidth: '50vw' }}>
+    <Box>
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
@@ -72,9 +72,9 @@ export const NeneCalendar = ({ setEventId }: Props) => {
         eventClick={handleEventClick}
       />
 
-      <NewEventModal //イベント登録モーダル
-        isOpen={isNewEventModalOpen}
-        onClose={handleCloseModal}
+      <NewEventDialog //イベント登録モーダル
+        isOpen={isNewEventDialogOpen}
+        onClose={handleCloseDialog}
         date={date}
       />
     </Box>

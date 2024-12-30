@@ -1,10 +1,10 @@
 import { auth } from '@/lib/firebase/firebaseClient';
-import { Alert, Box, Button, Snackbar, TextField } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { sendPasswordResetEmail } from 'firebase/auth';
-import { FormEvent, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { TextFieldRHF } from '../common/TextFieldRHF';
+import { useSnackbarContext } from '../common/SnackbarProvider';
 
 const changePasswordFormSchema = z.object({
   email: z
@@ -29,12 +29,7 @@ export const ChangePassword = () => {
       email: '',
     },
   });
-
-  const [snackbarMessage, setSnackbarMessage] = useState<{
-    severity: 'success' | 'error';
-    text: string;
-  }>({ severity: 'error', text: '' });
-  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
+  const { setSnackbarMessage, setIsSnackbarOpen } = useSnackbarContext();
 
   const changePassword = (data: ChangePasswordFormSchemaType) => {
     sendPasswordResetEmail(auth, data.email) //パスワード変更の為のメールを送る
@@ -64,20 +59,6 @@ export const ChangePassword = () => {
         justifyContent: 'center',
       }}
     >
-      <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        open={isSnackbarOpen}
-        onClose={() => setIsSnackbarOpen(false)}
-      >
-        <Alert
-          onClose={() => setIsSnackbarOpen(false)}
-          severity={snackbarMessage.severity}
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {snackbarMessage.text}
-        </Alert>
-      </Snackbar>
       <Box
         component="form"
         onSubmit={handleSubmit(changePassword)}

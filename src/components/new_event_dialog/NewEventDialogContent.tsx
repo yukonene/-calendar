@@ -1,24 +1,19 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import {
-  Button,
-  FormControlLabel,
-  FormLabel,
-  Radio,
-  RadioGroup,
-} from '@mui/material';
+import { Button } from '@mui/material';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
+import {
+  PostEventRequestBody,
+  PostEventResponseSuccessBody,
+} from '@/pages/api/events';
+import { format } from 'date-fns';
 import { Dispatch, SetStateAction } from 'react';
 import { TextFieldRHF } from '../common/TextFieldRHF';
 import { DatePickerRHF } from '../common/DatePickerRHF';
-import {
-  PatchEventRequestBody,
-  PatchEventResponseSuccessBody,
-} from '@/pages/api/events/[id]';
-import { EventT } from '@/types/EventT';
+import { useEventsContext } from '../EventsProvider';
 
 const style = {
   position: 'relative',
@@ -46,8 +41,6 @@ const eventScheme = z
     url: z.string().max(200, { message: '文字数超過' }).nullable(),
     member: z.string().max(100, { message: '文字数超過' }).nullable(),
     memo: z.string().max(255, { message: '文字数超過' }).nullable(),
-    diary: z.string().max(10000, { message: '文字数超過' }).nullable(),
-    success: z.boolean().nullable(),
   })
   .refine(
     //終了日時がnull、もしくは(||)終了時刻が開始日時より後の場合正しい入力値とする。
@@ -61,24 +54,23 @@ type EventSchemaType = z.infer<typeof eventScheme>;
 
 type Props = {
   onClose: () => void;
-  event: EventT;
-  getEvent: () => void;
-  setIsSnackbarOpen: Dispatch<SetStateAction<boolean>>;
+  date: Date;
   setSnackbarMessage: Dispatch<
     SetStateAction<{
       severity: 'success' | 'error';
       text: string;
     }>
   >;
+  setIsSnackbarOpen: Dispatch<SetStateAction<boolean>>;
 };
 
-export const EditEventModalContent = ({
+export const NewEventDialogContent = ({
   onClose,
-  event,
-  getEvent,
+  date,
   setSnackbarMessage,
   setIsSnackbarOpen,
 }: Props) => {
+  const { getEvents } = useEventsContext();
   const {
     //何を使うか
     control,
@@ -90,21 +82,19 @@ export const EditEventModalContent = ({
     mode: 'onSubmit',
     criteriaMode: 'all',
     defaultValues: {
-      title: event.title,
-      startDateTime: new Date(event.startDateTime),
-      endDateTime: event.endDateTime ? new Date(event.endDateTime) : null,
-      place: event.place,
-      url: event.url,
-      member: event.member,
-      memo: event.memo,
-      diary: event.diary,
-      success: event.success,
+      title: '',
+      startDateTime: date,
+      endDateTime: null,
+      place: '',
+      url: '',
+      member: '',
+      memo: '',
     },
   });
   console.log(errors);
 
-  const onEditNewEvent = (data: EventSchemaType) => {
-    const patchData: PatchEventRequestBody = {
+  const onCreateNewEvent = (data: EventSchemaType) => {
+    const postData: PostEventRequestBody = {
       title: data.title,
       startDateTime: data.startDateTime.toISOString(),
       endDateTime: data.endDateTime?.toISOString() || null,
@@ -112,28 +102,23 @@ export const EditEventModalContent = ({
       url: data.url || null,
       member: data.member || null,
       memo: data.memo || null,
-      diary: data.diary || null,
-      success: data.success || null,
     };
 
     axios
-      .patch<PatchEventResponseSuccessBody>(
-        `/api/events/${event.id}`,
-        patchData
-      ) //patchする
+      .post<PostEventResponseSuccessBody>('/api/events', postData) //POSTする
       .then(() => {
         setSnackbarMessage({
           severity: 'success',
-          text: 'イベント編集完了',
+          text: 'イベント登録完了',
         });
-        getEvent();
+        getEvents();
         setIsSnackbarOpen(true);
         onClose();
       })
       .catch((error) => {
         setSnackbarMessage({
           severity: 'error',
-          text: 'イベントの編集に失敗しました。',
+          text: 'イベントの登録に失敗しました。',
         });
         setIsSnackbarOpen(true);
       });
@@ -150,9 +135,11 @@ export const EditEventModalContent = ({
           alignItems: 'center',
         }}
       >
+        <Box component="h3">{format(date, ' MM月dd日')}</Box>
+
         <Box
           component="form"
-          onSubmit={handleSubmit(onEditNewEvent)}
+          onSubmit={handleSubmit(onCreateNewEvent)}
           sx={{
             display: 'flex',
             flexDirection: 'column',
@@ -179,7 +166,7 @@ export const EditEventModalContent = ({
               control={control}
               label="開催日時"
             />
-            <Box> ~ </Box>
+            <Box>-</Box>
             <DatePickerRHF<EventSchemaType>
               name="endDateTime"
               control={control}
@@ -207,41 +194,6 @@ export const EditEventModalContent = ({
             name="memo"
             label="詳細memo"
           />
-
-          <TextFieldRHF<EventSchemaType>
-            control={control}
-            name="diary"
-            label="イベントレポート"
-          />
-
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: '16px',
-            }}
-          >
-            <FormLabel id="success">脱出 </FormLabel>
-            <RadioGroup
-              row
-              aria-labelledby="demo-row-radio-buttons-group-label"
-              name="success"
-            >
-              <FormControlLabel
-                value="true"
-                control={<Radio />}
-                label="成功!!"
-                sx={{ color: '#0066CC' }}
-              />
-              <FormControlLabel
-                value="false"
-                control={<Radio />}
-                label="失敗"
-                sx={{ color: '#FF9872' }}
-              />
-            </RadioGroup>
-          </Box>
           <Box
             sx={{
               display: 'flex',
@@ -267,7 +219,7 @@ export const EditEventModalContent = ({
               variant="contained"
               sx={{ width: '150px', marginTop: '16px', margin: '8px' }}
             >
-              編集
+              登録
             </Button>
           </Box>
         </Box>
