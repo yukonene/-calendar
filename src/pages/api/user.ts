@@ -36,7 +36,6 @@ export default async function handler(
     req,
     res,
   })) as string;
-  console.log(token);
   //バリデーションチェック
   if (!token) {
     //tokenがfalseの場合status401を返す

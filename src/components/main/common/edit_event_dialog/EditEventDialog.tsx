@@ -1,23 +1,20 @@
 import { Dialog } from '@mui/material';
 import { EditEventDialogContent } from './EditEventDialogContent';
 import { EventT } from '@/types/EventT';
-import { useSnackbarContext } from '../common/SnackbarProvider';
 
 type Props = {
   event: EventT;
   isOpen: boolean;
   onClose: () => void;
-  getEvent: () => void;
+  afterSaveEvent: () => void;
 };
 
 export const EditEventDialog = ({
   event,
   isOpen,
   onClose,
-  getEvent,
+  afterSaveEvent,
 }: Props) => {
-  const { setSnackbarMessage, setIsSnackbarOpen } = useSnackbarContext();
-
   return (
     <>
       {/* useSnackbarContextを使っている為不要
@@ -36,13 +33,17 @@ export const EditEventDialog = ({
         </Alert>
       </Snackbar> */}
 
-      <Dialog open={isOpen} onClose={onClose}>
+      <Dialog
+        open={isOpen}
+        onClose={onClose}
+        scroll="body"
+        fullWidth
+        maxWidth={'sm'}
+      >
         <EditEventDialogContent
           event={event}
           onClose={onClose}
-          getEvent={getEvent}
-          setSnackbarMessage={setSnackbarMessage}
-          setIsSnackbarOpen={setIsSnackbarOpen}
+          afterSaveEvent={afterSaveEvent}
         />
       </Dialog>
     </>

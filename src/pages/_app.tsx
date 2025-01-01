@@ -1,4 +1,5 @@
 import { FirebaseUserProvider } from '@/components/common/FirebaseUserProvider';
+import Layout from '@/components/common/Layout';
 import { ResponsiveProvider } from '@/components/common/ResponsiveProvider';
 import { SnackbarProvider } from '@/components/common/SnackbarProvider';
 import '@/styles/globals.css';
@@ -9,8 +10,10 @@ export default function App({ Component, pageProps }: AppProps) {
     <FirebaseUserProvider>
       <ResponsiveProvider>
         <SnackbarProvider>
-          {/* api以外全てのコンポーネントで使えるもの */}
-          <Component {...pageProps} />
+          <Layout>
+            {/* api以外全てのコンポーネントで使えるもの */}
+            <Component {...pageProps} />
+          </Layout>
         </SnackbarProvider>
       </ResponsiveProvider>
     </FirebaseUserProvider>

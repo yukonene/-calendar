@@ -4,14 +4,17 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
-import { TextFieldRHF } from '../common/TextFieldRHF';
+import { TextFieldRHF } from '../../common/TextFieldRHF';
 import { Button, Link } from '@mui/material';
 import {
   PatchUserRequestBody,
   PatchUserResponseSuccessBody,
 } from '@/pages/api/user';
 import { LoadingButton } from '@mui/lab';
-import { PostGenerateSignedUrlResposeSuccessBody } from '@/pages/api/generateSignedUrl';
+import {
+  PostGenerateSignedUrlsRequestBody,
+  PostGenerateSignedUrlsResposeSuccessBody,
+} from '@/pages/api/generateSignedUrls';
 import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from 'react';
 import { UserT } from '@/types/UserT';
 import ModeEditTwoToneIcon from '@mui/icons-material/ModeEditTwoTone';
@@ -33,7 +36,6 @@ const userProfileScheme = z.object({
       return !file || file.size <= MAX_UPLOAD_SIZE;
     }, 'ファイルサイズを30MB以内にしてください')
     .refine((file) => {
-      console.log('file.type', file?.type);
       return !file || ACCEPTED_FILE_TYPES.includes(file.type);
     }, '画像ファイルのみアップロードできます'),
   activityAreas: z.string().max(255, { message: '文字数超過' }).nullable(),
@@ -89,8 +91,6 @@ export const EditUserDialogContent = ({
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(
     user.avatarUrl ?? undefined
   );
-  console.log('errors ', errors);
-  console.log('watch', watch());
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const onChangeAvatar = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -124,17 +124,19 @@ export const EditUserDialogContent = ({
       let filename = null;
       if (!!data.avatar) {
         //signedURLの取得
-        const res = await axios.post<PostGenerateSignedUrlResposeSuccessBody>(
-          '/api/generateSignedUrl'
+        const postData: PostGenerateSignedUrlsRequestBody = {
+          uploadLength: 1,
+        };
+        const res = await axios.post<PostGenerateSignedUrlsResposeSuccessBody>(
+          '/api/generateSignedUrls',
+          postData
         );
-        fileKey = res.data.fileKey;
+        fileKey = res.data.uploads[0].fileKey;
         //fileにnameをつけるとファイルの名前がとれる決まり
         filename = data.avatar.name;
 
-        console.log('res.data.signedGcsUrl', res.data.signedGcsUrl);
-
         //取得したURLを使ってＧＣＳにファイルをPUTする
-        await axios.put(res.data.signedGcsUrl, data.avatar, {
+        await axios.put(res.data.uploads[0].signedGcsUrl, data.avatar, {
           headers: {
             'Content-Type': 'application/octet-stream',
           },

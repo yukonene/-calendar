@@ -32,7 +32,7 @@ export default async function handler(
         uid: uid,
       },
     });
-    console.log('user', user);
+
     if (!isEmailVerified) {
       res
         .status(401)

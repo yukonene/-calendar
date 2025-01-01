@@ -1,6 +1,6 @@
 import { UserT } from '@/types/UserT';
 import { Dialog } from '@mui/material';
-import { useSnackbarContext } from '../common/SnackbarProvider';
+import { useSnackbarContext } from '../../common/SnackbarProvider';
 import { EditUserDialogContent } from './EditUserDialogContent';
 
 type Props = {

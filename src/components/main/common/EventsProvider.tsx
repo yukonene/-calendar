@@ -10,26 +10,13 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { useFirebaseUserContext } from './common/FirebaseUserProvider';
+import { useFirebaseUserContext } from '../../common/FirebaseUserProvider';
+import { EventT } from '@/types/EventT';
 
 const EventsContext = createContext(
   {} as {
-    events: {
-      id: number;
-      title: string;
-      startDateTime: string;
-      endDateTime: string | null;
-    }[];
-    setEvents: Dispatch<
-      SetStateAction<
-        {
-          id: number;
-          title: string;
-          startDateTime: string;
-          endDateTime: string | null;
-        }[]
-      >
-    >;
+    events: EventT[];
+    setEvents: Dispatch<SetStateAction<EventT[]>>;
     getEvents: () => void;
   }
 );
@@ -44,14 +31,7 @@ type Props = {
 
 export const EventsProvider = ({ children }: Props) => {
   const { firebaseUser } = useFirebaseUserContext();
-  const [events, setEvents] = useState<
-    {
-      id: number;
-      title: string;
-      startDateTime: string;
-      endDateTime: string | null;
-    }[]
-  >([]);
+  const [events, setEvents] = useState<EventT[]>([]);
 
   const getEvents = useCallback(() => {
     //基本的にはusecallbackつける
@@ -70,7 +50,7 @@ export const EventsProvider = ({ children }: Props) => {
     if (!!firebaseUser) {
       getEvents();
     }
-  }, [getEvents]);
+  }, [getEvents, firebaseUser]);
 
   return (
     <EventsContext.Provider value={{ events, setEvents, getEvents }}>

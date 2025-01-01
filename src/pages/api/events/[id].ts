@@ -48,7 +48,6 @@ export default async function handler(
     //トークンの検証をする
 
     const decodedToken = await auth.verifyIdToken(token); //トークンの検証に成功したらデータの復号化したデータを返す
-    console.log('token', token);
     const uid = decodedToken.uid; //復号化したデータの中のuidを取り出す
     const isEmailVerified = decodedToken.email_verified;
     const user = await prisma.user.findUnique({
@@ -57,7 +56,7 @@ export default async function handler(
         uid: uid,
       },
     });
-    console.log('user', user);
+
     if (!isEmailVerified) {
       res
         .status(401)

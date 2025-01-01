@@ -12,6 +12,12 @@ export type GetEventsResponseSuccessBody = {
     title: string;
     startDateTime: string;
     endDateTime: string | null;
+    place: string | null;
+    url: string | null;
+    member: string | null;
+    memo: string | null;
+    diary: string | null;
+    success: boolean | null;
   }[];
 };
 
@@ -49,7 +55,6 @@ export default async function handler(
     //トークンの検証をする
 
     const decodedToken = await auth.verifyIdToken(token); //トークンの検証に成功したらデータの復号化したデータを返す
-    console.log('token', token);
     const uid = decodedToken.uid; //復号化したデータの中のuidを取り出す
     const isEmailVerified = decodedToken.email_verified;
     const user = await prisma.user.findUnique({
@@ -58,7 +63,7 @@ export default async function handler(
         uid: uid,
       },
     });
-    console.log('user', user);
+
     if (!isEmailVerified) {
       res
         .status(401)
@@ -86,6 +91,12 @@ export default async function handler(
             // toISOSting()でISO8601の表示形式にする'2024-12-14T11:36:06.137Z'
             startDateTime: event.startDateTime.toISOString(),
             endDateTime: event.endDateTime?.toISOString() || null,
+            place: event.place,
+            url: event.url,
+            member: event.member,
+            memo: event.memo,
+            diary: event.diary,
+            success: event.success,
           };
         }),
       };

@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { NewEventDialogContent } from './NewEventDialogContent';
-import { useSnackbarContext } from '../common/SnackbarProvider';
 import { Dialog } from '@mui/material';
 
 type Props = {
@@ -8,10 +7,15 @@ type Props = {
   isOpen: boolean;
   onClose: () => void;
   date: Date | undefined;
+  afterSaveEvent: () => void;
 };
 
-export const NewEventDialog = ({ isOpen, onClose, date }: Props) => {
-  const { setSnackbarMessage, setIsSnackbarOpen } = useSnackbarContext();
+export const NewEventDialog = ({
+  isOpen,
+  onClose,
+  date,
+  afterSaveEvent,
+}: Props) => {
   return (
     <>
       {/* dateの値がある場合 */}
@@ -20,8 +24,7 @@ export const NewEventDialog = ({ isOpen, onClose, date }: Props) => {
           <NewEventDialogContent
             onClose={onClose}
             date={date}
-            setSnackbarMessage={setSnackbarMessage}
-            setIsSnackbarOpen={setIsSnackbarOpen}
+            afterSaveEvent={afterSaveEvent}
           />
         </Dialog>
       )}

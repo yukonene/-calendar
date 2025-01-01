@@ -71,7 +71,6 @@ export const Register = () => {
       passwordConfirmation: '',
     },
   });
-  console.log(errors);
 
   const router = useRouter();
 
@@ -99,7 +98,6 @@ export const Register = () => {
       .then((userCredential) => {
         // ユーザー登録すると自動的にログインされてuserCredential.userでユーザーの情報を取得できる
         const user = userCredential.user;
-        console.log(user);
         user
           .getIdToken() //トークン取得
           .then((token) => {
@@ -110,11 +108,9 @@ export const Register = () => {
                 sendEmailVerification(user)
                   .then(() => {
                     //確認メールの送信に成功したら
-                    console.log('確認メールを送信しました');
                     router.push('/sendConfirmationEmail');
                   }) //↓ここからエラー文
                   .catch((error) => {
-                    console.log('確認メールの送信に失敗しました。');
                     setSnackbarMessage({
                       severity: 'error',
                       text: '確認メールの送信に失敗しました。',
@@ -137,7 +133,7 @@ export const Register = () => {
         if (error instanceof FirebaseError) {
           // 例　{"code":"auth/email-already-in-use","customData":{"appName":"[DEFAULT]","_tokenResponse":{"error":{"code":400,"message":"EMAIL_EXISTS","errors":[{"message":"EMAIL_EXISTS","domain":"global","reason":"invalid"}]}}},"name":"FirebaseError"}
           //エラーがfirebaseに関連したものであれば
-          console.log(JSON.stringify(error));
+          // console.log(JSON.stringify(error));
           if (error.code === 'auth/email-already-in-use') {
             // do something
             setSnackbarMessage({
@@ -152,7 +148,7 @@ export const Register = () => {
             text: 'アカウントの作成に失敗しました。',
           });
           setIsSnackbarOpen(true);
-          console.log(JSON.stringify(error));
+          // console.log(JSON.stringify(error));
         }
       });
   };

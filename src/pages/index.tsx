@@ -1,5 +1,5 @@
-import { EventsProvider } from '@/components/EventsProvider';
-import { Main } from '@/components/Main';
+import { EventsProvider } from '@/components/main/common/EventsProvider';
+import { Main } from '@/components/main/Main';
 
 export default function HomePage() {
   return (

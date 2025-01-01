@@ -11,23 +11,10 @@ import {
 } from '@/pages/api/events';
 import { format } from 'date-fns';
 import { Dispatch, SetStateAction } from 'react';
-import { TextFieldRHF } from '../common/TextFieldRHF';
-import { DatePickerRHF } from '../common/DatePickerRHF';
+import { TextFieldRHF } from '../../../common/TextFieldRHF';
+import { DatePickerRHF } from '../../../common/DatePickerRHF';
 import { useEventsContext } from '../EventsProvider';
-
-const style = {
-  position: 'relative',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-
-  bgcolor: 'background.paper',
-
-  boxShadow: 24,
-  pt: 2,
-  px: 4,
-  pb: 3,
-};
+import { useSnackbarContext } from '../../../common/SnackbarProvider';
 
 const eventScheme = z
   .object({
@@ -55,22 +42,14 @@ type EventSchemaType = z.infer<typeof eventScheme>;
 type Props = {
   onClose: () => void;
   date: Date;
-  setSnackbarMessage: Dispatch<
-    SetStateAction<{
-      severity: 'success' | 'error';
-      text: string;
-    }>
-  >;
-  setIsSnackbarOpen: Dispatch<SetStateAction<boolean>>;
+  afterSaveEvent: () => void;
 };
 
 export const NewEventDialogContent = ({
   onClose,
   date,
-  setSnackbarMessage,
-  setIsSnackbarOpen,
+  afterSaveEvent,
 }: Props) => {
-  const { getEvents } = useEventsContext();
   const {
     //何を使うか
     control,
@@ -91,7 +70,7 @@ export const NewEventDialogContent = ({
       memo: '',
     },
   });
-  console.log(errors);
+  const { setSnackbarMessage, setIsSnackbarOpen } = useSnackbarContext();
 
   const onCreateNewEvent = (data: EventSchemaType) => {
     const postData: PostEventRequestBody = {
@@ -111,7 +90,7 @@ export const NewEventDialogContent = ({
           severity: 'success',
           text: 'イベント登録完了',
         });
-        getEvents();
+        afterSaveEvent();
         setIsSnackbarOpen(true);
         onClose();
       })
@@ -125,103 +104,99 @@ export const NewEventDialogContent = ({
   };
 
   return (
-    <Box //全体
-      sx={{ ...style, width: '600px' }}
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
     >
+      <Box component="h3">{format(date, ' MM月dd日')}</Box>
+
       <Box
+        component="form"
+        onSubmit={handleSubmit(onCreateNewEvent)}
         sx={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
+          gap: '16px',
+          padding: '32px',
+          width: '100%',
         }}
       >
-        <Box component="h3">{format(date, ' MM月dd日')}</Box>
-
+        <TextFieldRHF<EventSchemaType>
+          control={control}
+          name="title"
+          label="イベントタイトル"
+        />
         <Box
-          component="form"
-          onSubmit={handleSubmit(onCreateNewEvent)}
           sx={{
             display: 'flex',
-            flexDirection: 'column',
+            gap: '10px',
             alignItems: 'center',
-            gap: '16px',
-            padding: '32px',
-            width: '100%',
           }}
         >
-          <TextFieldRHF<EventSchemaType>
+          <DatePickerRHF<EventSchemaType>
+            name="startDateTime"
             control={control}
-            name="title"
-            label="イベントタイトル"
+            label="開催日時"
           />
-          <Box
+          <Box>-</Box>
+          <DatePickerRHF<EventSchemaType>
+            name="endDateTime"
+            control={control}
+            label="終了日時"
+          />
+        </Box>
+        <TextFieldRHF<EventSchemaType>
+          control={control}
+          name="place"
+          label="開催場所"
+        />
+        <TextFieldRHF<EventSchemaType>
+          control={control}
+          name="url"
+          label="イベントページURL"
+          // リンクつける
+        />
+        <TextFieldRHF<EventSchemaType>
+          control={control}
+          name="member"
+          label="同行メンバー"
+        />
+        <TextFieldRHF<EventSchemaType>
+          control={control}
+          name="memo"
+          label="詳細memo"
+        />
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <Button
+            onClick={onClose}
+            variant="contained"
             sx={{
-              display: 'flex',
-              gap: '10px',
-              alignItems: 'center',
+              width: '100px',
+              marginTop: '16px',
+              fontSize: 'small',
+              backgroundColor: 'gray',
+              color: 'white',
+              margin: '8px',
             }}
           >
-            <DatePickerRHF<EventSchemaType>
-              name="startDateTime"
-              control={control}
-              label="開催日時"
-            />
-            <Box>-</Box>
-            <DatePickerRHF<EventSchemaType>
-              name="endDateTime"
-              control={control}
-              label="終了日時"
-            />
-          </Box>
-          <TextFieldRHF<EventSchemaType>
-            control={control}
-            name="place"
-            label="開催場所"
-          />
-          <TextFieldRHF<EventSchemaType>
-            control={control}
-            name="url"
-            label="イベントページURL"
-            // リンクつける
-          />
-          <TextFieldRHF<EventSchemaType>
-            control={control}
-            name="member"
-            label="同行メンバー"
-          />
-          <TextFieldRHF<EventSchemaType>
-            control={control}
-            name="memo"
-            label="詳細memo"
-          />
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-            }}
+            キャンセル
+          </Button>
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{ width: '150px', marginTop: '16px', margin: '8px' }}
           >
-            <Button
-              onClick={onClose}
-              variant="contained"
-              sx={{
-                width: '100px',
-                marginTop: '16px',
-                fontSize: 'small',
-                backgroundColor: 'gray',
-                color: 'white',
-                margin: '8px',
-              }}
-            >
-              キャンセル
-            </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{ width: '150px', marginTop: '16px', margin: '8px' }}
-            >
-              登録
-            </Button>
-          </Box>
+            登録
+          </Button>
         </Box>
       </Box>
     </Box>

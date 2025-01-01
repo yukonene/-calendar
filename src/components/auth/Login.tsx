@@ -48,18 +48,16 @@ export const Login = () => {
       password: '',
     },
   });
-  console.log(errors);
+  // console.log(errors);
   const [loginError, setLoginError] = useState('');
   const [isSnackbarErrorOpen, setIsSnackbarErrorOpen] = useState(false);
   const router = useRouter();
-  console.log(0);
+
   const login = (data: LoginFormSchemaType) => {
-    console.log(data);
     signInWithEmailAndPassword(auth, data.email, data.password)
       .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
-        console.log(user);
         user
           .getIdToken() //トークン取得
           .then((token) => {
@@ -67,7 +65,6 @@ export const Login = () => {
             axios
               .get('/api/login')
               .then(() => {
-                console.log('response');
                 setFirebaseUser(user); //ログインの状態を保持
                 router.push('/');
               })
@@ -84,7 +81,7 @@ export const Login = () => {
         if (error instanceof FirebaseError) {
           // 例　{"code":"auth/email-already-in-use","customData":{"appName":"[DEFAULT]","_tokenResponse":{"error":{"code":400,"message":"EMAIL_EXISTS","errors":[{"message":"EMAIL_EXISTS","domain":"global","reason":"invalid"}]}}},"name":"FirebaseError"}
           //エラーがfirebaseに関連したものであれば
-          console.log(JSON.stringify(error));
+          // console.log(JSON.stringify(error));
           if (error.code === 'auth/user-not-found') {
             // do something
             setLoginError('認証に失敗しました。');

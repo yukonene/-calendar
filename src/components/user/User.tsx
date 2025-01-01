@@ -3,7 +3,7 @@ import { EditUserDialog } from './edit_user_dialog/EditUserDialog';
 import { Box, Button, CircularProgress } from '@mui/material';
 import axios from 'axios';
 import { GetUserResponseSuccessBody } from '@/pages/api/user';
-import { useFirebaseUserContext } from './common/FirebaseUserProvider';
+import { useFirebaseUserContext } from '../common/FirebaseUserProvider';
 import { UserT } from '@/types/UserT';
 
 export const User = () => {
@@ -34,14 +34,14 @@ export const User = () => {
     if (!!firebaseUser) {
       getProfile();
     }
-  }, [getProfile]);
+  }, [getProfile, firebaseUser]);
 
   //ローディング中のuser内が空の時にCircularProgressを表示する
   //これによって一番下のretrunが表示されなくなる為user=undifindを避けられる
   if (!user) {
     return (
-      <Box sx={{ display: 'flex' }}>
-        <CircularProgress />
+      <Box sx={{ display: 'flex', height: '100%' }}>
+        <CircularProgress sx={{ margin: 'auto' }} />
       </Box>
     );
   }
