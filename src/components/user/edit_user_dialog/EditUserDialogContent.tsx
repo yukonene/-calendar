@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import { TextFieldRHF } from '../../common/TextFieldRHF';
-import { Button, Link } from '@mui/material';
+import { Avatar, Button, Link } from '@mui/material';
 import {
   PatchUserRequestBody,
   PatchUserResponseSuccessBody,
@@ -19,6 +19,7 @@ import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from 'react';
 import { UserT } from '@/types/UserT';
 import ModeEditTwoToneIcon from '@mui/icons-material/ModeEditTwoTone';
 import { ACCEPTED_FILE_TYPES, MAX_UPLOAD_SIZE } from '@/constants/imageSetting';
+import src from '@emotion/styled';
 
 const userProfileScheme = z.object({
   name: z.string(),
@@ -201,10 +202,10 @@ export const EditUserDialogContent = ({
         <Box sx={{ width: '100%' }}>
           <Box sx={{ fontSize: 'small', padding: '6px' }}>プロフィール画像</Box>
           {!!avatarUrl && (
-            <img
+            <Avatar
+              alt="avatar"
               src={avatarUrl}
-              alt="avatarUrl"
-              style={{ objectFit: 'contain', width: '100%', height: '250px' }}
+              sx={{ width: '70px', height: '70px', marginBottom: '8px' }}
             />
           )}
           <input
@@ -232,22 +233,27 @@ export const EditUserDialogContent = ({
           control={control}
           name="activityAreas"
           label="イベント参加地域"
+          multiline={true}
+          autoComplete="off"
         />
         <TextFieldRHF<UserProfileSchemaType>
           control={control}
           name="favoriteType"
           label="好きなイベントのタイプ"
+          multiline={true}
         />
 
         <TextFieldRHF<UserProfileSchemaType>
           control={control}
           name="strongPoints"
           label="得意な謎、配役等"
+          multiline={true}
         />
         <TextFieldRHF<UserProfileSchemaType>
           control={control}
           name="favoriteGroup"
           label="よく行く、推しの団体"
+          multiline={true}
         />
 
         <Box
@@ -272,7 +278,12 @@ export const EditUserDialogContent = ({
             保存
           </LoadingButton>
 
-          <Link component={'button'} onClick={onClose} variant={'body2'}>
+          <Link
+            component={'button'}
+            type={'button'}
+            onClick={onClose}
+            variant={'body2'}
+          >
             キャンセル
           </Link>
         </Box>

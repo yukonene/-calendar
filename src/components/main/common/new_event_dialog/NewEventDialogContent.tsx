@@ -10,10 +10,8 @@ import {
   PostEventResponseSuccessBody,
 } from '@/pages/api/events';
 import { format } from 'date-fns';
-import { Dispatch, SetStateAction } from 'react';
 import { TextFieldRHF } from '../../../common/TextFieldRHF';
 import { DatePickerRHF } from '../../../common/DatePickerRHF';
-import { useEventsContext } from '../EventsProvider';
 import { useSnackbarContext } from '../../../common/SnackbarProvider';
 
 const eventScheme = z
@@ -163,11 +161,13 @@ export const NewEventDialogContent = ({
           control={control}
           name="member"
           label="同行メンバー"
+          multiline={true}
         />
         <TextFieldRHF<EventSchemaType>
           control={control}
           name="memo"
           label="詳細memo"
+          multiline={true}
         />
         <Box
           sx={{

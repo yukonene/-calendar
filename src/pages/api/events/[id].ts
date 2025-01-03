@@ -142,7 +142,7 @@ export default async function handler(
           member: event.member || null,
           memo: event.memo || null,
           diary: event.diary || null,
-          success: event.success || null,
+          success: event.success,
         },
         eventPhotos:
           !!eventPhotoUrl && !!eventPhotoFileKey

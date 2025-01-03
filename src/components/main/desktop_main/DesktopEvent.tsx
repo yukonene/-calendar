@@ -21,7 +21,7 @@ export const DesktopEvent = ({ eventId }: Props) => {
     event: EventT;
     eventPhotos: EventPhotoT[];
   }>();
-  const [eventPhotos, setEventPhotos] = useState<EventPhotoT[]>([]);
+  // const [eventPhotos, setEventPhotos] = useState<EventPhotoT[]>([]);
 
   const getEventInfo = useCallback(() => {
     if (!eventId) {
@@ -80,7 +80,6 @@ export const DesktopEvent = ({ eventId }: Props) => {
         borderRadius: '20px',
         padding: '16px',
         boxShadow: '2',
-        height: '100%',
       }}
     >
       {/* タイトル */}
@@ -88,7 +87,7 @@ export const DesktopEvent = ({ eventId }: Props) => {
         <Box component={'label'} sx={{ fontSize: 'small' }}>
           イベントタイトル
         </Box>
-        <Box>{eventInfo.event.title}</Box>
+        <Box sx={{ wordBreak: 'break-word' }}>{eventInfo.event.title}</Box>
       </Box>
 
       {/* イベント日時 */}
@@ -108,7 +107,7 @@ export const DesktopEvent = ({ eventId }: Props) => {
           <Box component={'label'} sx={{ fontSize: 'small' }}>
             開催場所
           </Box>
-          <Box>{eventInfo.event.place}</Box>
+          <Box sx={{ wordBreak: 'break-word' }}>{eventInfo.event.place}</Box>
         </Box>
       )}
 
@@ -116,6 +115,7 @@ export const DesktopEvent = ({ eventId }: Props) => {
       {!!eventInfo.event.url && (
         <Link
           component={'button'}
+          type={'button'}
           onClick={() => {
             if (!!eventInfo.event.url) {
               window.open(eventInfo.event.url);
@@ -132,7 +132,9 @@ export const DesktopEvent = ({ eventId }: Props) => {
           <Box component={'label'} sx={{ fontSize: 'small' }}>
             同行メンバー
           </Box>
-          <Box>{eventInfo.event.member}</Box>
+          <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+            {eventInfo.event.member}
+          </Box>
         </Box>
       )}
 
@@ -142,7 +144,10 @@ export const DesktopEvent = ({ eventId }: Props) => {
           <Box component={'label'} sx={{ fontSize: 'small' }}>
             詳細
           </Box>
-          <Box>{eventInfo.event.memo}</Box>
+          {/* whiteSpace: 'pre-wrap'→ユーザーが入力したテキストをそのまま見せたいとき */}
+          <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+            {eventInfo.event.memo}
+          </Box>
         </Box>
       )}
 
@@ -152,14 +157,16 @@ export const DesktopEvent = ({ eventId }: Props) => {
           <Box component={'label'} sx={{ fontSize: 'small' }}>
             イベントレポート
           </Box>
-          <Box>{eventInfo.event.diary}</Box>
+          <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+            {eventInfo.event.diary}
+          </Box>
         </Box>
       )}
 
       {/* イベントフォト */}
-      {eventPhotos.length > 0 && (
+      {eventInfo.eventPhotos.length > 0 && (
         <img
-          src={eventPhotos[0].url}
+          src={eventInfo.eventPhotos[0].url}
           alt="eventPhoto"
           style={{ objectFit: 'contain', width: '100%', height: '250px' }}
         />
@@ -167,7 +174,14 @@ export const DesktopEvent = ({ eventId }: Props) => {
 
       {/* 成功・失敗 */}
       {eventInfo.event.success != null && (
-        <Box sx={{ display: 'flex', flexDirection: 'row', gap: '4px' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            gap: '4px',
+            color: eventInfo.event.success ? '#0066CC' : '#FF9872',
+          }}
+        >
           <Box component={'label'}>
             {eventInfo.event.success != null && '脱出'}
           </Box>
@@ -177,43 +191,43 @@ export const DesktopEvent = ({ eventId }: Props) => {
           </Box>
         </Box>
       )}
-
-      <Button
-        variant="contained"
-        size="small"
-        sx={{
-          width: '100px',
-          marginTop: '16px',
-          marginLeft: 'auto',
-        }}
-        onClick={handleEditEventClick}
-        startIcon={<ModeEditTwoToneIcon />}
-      >
-        編集
-      </Button>
-      <EditEventDialog
-        eventInfo={eventInfo}
-        isOpen={editEventDialogOpen}
-        onClose={() => setEditEventDialogOpen(false)}
-        afterSaveEvent={getEventInfo}
-      />
-      <Box sx={{ display: 'flex' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
         <Link
           component={'button'}
+          type={'button'}
           onClick={handleClickOpen}
           variant={'body2'}
-          sx={{ marginLeft: 'auto' }}
+          sx={{ marginRight: 'auto' }}
         >
           削除
         </Link>
-      </Box>
 
-      <DeleteEventDialog
-        eventInfo={eventInfo}
-        isOpen={isDeleteEventDialogOpen}
-        onClose={handleClose}
-        afterDeleteEvent={getEventInfoList}
-      />
+        <DeleteEventDialog
+          eventInfo={eventInfo}
+          isOpen={isDeleteEventDialogOpen}
+          onClose={handleClose}
+          afterDeleteEvent={getEventInfoList}
+        />
+        <Button
+          variant="contained"
+          size="small"
+          sx={{
+            width: '100px',
+            marginTop: '16px',
+            marginLeft: 'auto',
+          }}
+          onClick={handleEditEventClick}
+          startIcon={<ModeEditTwoToneIcon />}
+        >
+          編集
+        </Button>
+        <EditEventDialog
+          eventInfo={eventInfo}
+          isOpen={editEventDialogOpen}
+          onClose={() => setEditEventDialogOpen(false)}
+          afterSaveEvent={getEventInfo}
+        />
+      </Box>
     </Box>
   );
 };

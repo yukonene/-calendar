@@ -5,7 +5,7 @@ import { auth } from '@/lib/firebase/firebaseClient';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import { GetUserResponseSuccessBody } from '@/pages/api/user';
-import { Box, Button } from '@mui/material';
+import { Avatar, Box, Button } from '@mui/material';
 import Link from 'next/link';
 
 // レイアウトという名前の新しいコンポーネントを作ります
@@ -50,29 +50,43 @@ export default function Layout({ children }: { children: ReactNode }) {
           flexDirection: 'column',
         }}
       >
-        <Link
-          href="/"
-          passHref
-          style={{
-            fontSize: '30px',
-            fontWeight: 'bolder',
-            padding: '6px',
-            color: '#008080',
-          }}
-        >
-          {process.env.NEXT_PUBLIC_APP_TITLE}
-        </Link>
-        <Box
-          sx={{
-            marginLeft: 'auto',
-          }}
-        >
-          {!!firebaseUser && !!user && (
+        <Box>
+          <Link
+            href="/"
+            passHref
+            style={{
+              fontSize: '20px',
+              fontWeight: 'bolder',
+              padding: '6px',
+              color: '#008080',
+            }}
+          >
+            {process.env.NEXT_PUBLIC_APP_TITLE}
+          </Link>
+        </Box>
+        {!!firebaseUser && !!user && (
+          <Box
+            sx={{
+              display: 'flex',
+              marginLeft: 'auto',
+              alignItems: 'center',
+            }}
+          >
+            {!!user.avatarUrl && (
+              <Link href="/profile" passHref>
+                <Avatar
+                  alt="avatar"
+                  src={user.avatarUrl}
+                  sx={{ width: 50, height: 50 }}
+                />
+              </Link>
+            )}
+
             <Link href="/profile" passHref>
               <Button>{user.name}</Button>
             </Link>
-          )}
-        </Box>
+          </Box>
+        )}
         {/* ログインログアウト切り替え */}
         {!!firebaseUser ? (
           <Box sx={{ marginLeft: 'auto', fontSize: 'small' }}>

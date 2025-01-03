@@ -7,12 +7,12 @@ import { EventPhotoT } from '@/types/EventPhotoT';
 type Props = {
   setValue: UseFormSetValue<EventSchemaType>;
   index: number;
-  eventPhoto: EventPhotoT;
+  eventPhoto: EventPhotoT | undefined;
 };
 
 export const EventPhoto = ({ setValue, index, eventPhoto }: Props) => {
   const [eventPhotoUrl, setEventPhotoUrl] = useState<string | undefined>(
-    eventPhoto.url ?? undefined
+    eventPhoto?.url ?? undefined
   );
   const eventPhotoInputRef = useRef<HTMLInputElement>(null);
 

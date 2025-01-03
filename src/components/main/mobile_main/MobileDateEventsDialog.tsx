@@ -122,7 +122,10 @@ export const MobileDateEventsDialog = ({
               id="panel1-header"
             >
               {/* イベントタイトル */}
-              <Typography component="span" sx={{ fontWeight: 'bold' }}>
+              <Typography
+                component="span"
+                sx={{ fontWeight: 'bold', wordBreak: 'break-word' }}
+              >
                 {dateEventInfo.event.title}
               </Typography>
             </AccordionSummary>
@@ -166,13 +169,16 @@ export const MobileDateEventsDialog = ({
                   >
                     開催場所
                   </Box>
-                  <Box>{dateEventInfo.event.place}</Box>
+                  <Box sx={{ wordBreak: 'break-word' }}>
+                    {dateEventInfo.event.place}
+                  </Box>
                 </Box>
               )}
               {/* URL */}
               {!!dateEventInfo.event.url && (
                 <Link
                   component={'button'}
+                  type={'button'}
                   onClick={() => {
                     if (!!dateEventInfo.event.url) {
                       window.open(dateEventInfo.event.url);
@@ -191,7 +197,9 @@ export const MobileDateEventsDialog = ({
                   >
                     同行メンバー
                   </Box>
-                  <Box>{dateEventInfo.event.member}</Box>
+                  <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                    {dateEventInfo.event.member}
+                  </Box>
                 </Box>
               )}
               {/* memo */}
@@ -203,7 +211,9 @@ export const MobileDateEventsDialog = ({
                   >
                     詳細
                   </Box>
-                  <Box>{dateEventInfo.event.memo}</Box>
+                  <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                    {dateEventInfo.event.memo}
+                  </Box>
                 </Box>
               )}
 
@@ -216,8 +226,22 @@ export const MobileDateEventsDialog = ({
                   >
                     イベントレポート
                   </Box>
-                  <Box>{dateEventInfo.event.diary}</Box>
+                  <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                    {dateEventInfo.event.diary}
+                  </Box>
                 </Box>
+              )}
+              {/* イベントフォト */}
+              {dateEventInfo.eventPhotos.length > 0 && (
+                <img
+                  src={dateEventInfo.eventPhotos[0].url}
+                  alt="eventPhoto"
+                  style={{
+                    objectFit: 'contain',
+                    width: '100%',
+                    height: '250px',
+                  }}
+                />
               )}
 
               {/* 成功・失敗 */}
@@ -227,7 +251,7 @@ export const MobileDateEventsDialog = ({
                     display: 'flex',
                     flexDirection: 'row',
                     gap: '4px',
-                    color: 'blue',
+                    color: dateEventInfo.event.success ? '#0066CC' : '#FF9872',
                   }}
                 >
                   <Box component={'label'}>
@@ -243,6 +267,7 @@ export const MobileDateEventsDialog = ({
               <Box sx={{ display: 'flex' }}>
                 <Link
                   component={'button'}
+                  type={'button'}
                   onClick={() => handleDeleteEventClick(dateEventInfo)}
                   variant={'body2'}
                   sx={{

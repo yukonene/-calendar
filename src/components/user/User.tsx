@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { EditUserDialog } from './edit_user_dialog/EditUserDialog';
-import { Box, Button, CircularProgress } from '@mui/material';
+import { Avatar, Box, Button, CircularProgress } from '@mui/material';
 import axios from 'axios';
 import { GetUserResponseSuccessBody } from '@/pages/api/user';
 import { useFirebaseUserContext } from '../common/FirebaseUserProvider';
 import { UserT } from '@/types/UserT';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 export const User = () => {
   const [editUserDialogOpen, SetEditUserDialogOpen] = useState(false);
@@ -52,6 +51,9 @@ export const User = () => {
       sx={{
         display: 'flex',
         width: '100%',
+        height: '100%',
+        overflowY: 'auto',
+        // overflowをつける前に親のheightを確認する。自分自身の高さが決まっている状態でのみ使える。
       }}
     >
       <Box
@@ -64,7 +66,8 @@ export const User = () => {
           borderRadius: '20px',
           padding: '16px',
           boxShadow: '2',
-          width: '580px',
+          maxWidth: '700px',
+
           margin: 'auto',
           marginTop: '8px',
         }}
@@ -85,7 +88,6 @@ export const User = () => {
               borderRadius: '20px',
               padding: '16px',
               boxShadow: '2',
-              width: '260px',
             }}
           >
             <Box
@@ -97,15 +99,15 @@ export const User = () => {
             >
               名前
             </Box>
-            <Box>{user.name}</Box>
+            <Box sx={{ wordBreak: 'break-word' }}>{user.name}</Box>
           </Box>
 
           {/* プロフィール画像 */}
           {!!user.avatarUrl && (
-            <img
+            <Avatar
               src={user.avatarUrl}
               alt="avatar"
-              style={{ objectFit: 'contain', width: '100%', height: '250px' }}
+              sx={{ width: '70px', height: '70px', marginBottom: '8px' }}
             />
           )}
 
@@ -118,7 +120,6 @@ export const User = () => {
                 borderRadius: '20px',
                 padding: '16px',
                 boxShadow: '2',
-                width: '260px',
               }}
             >
               <Box
@@ -127,7 +128,9 @@ export const User = () => {
               >
                 イベント参加地域
               </Box>
-              <Box>{user.activityAreas}</Box>
+              <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                {user.activityAreas}
+              </Box>
             </Box>
           )}
 
@@ -140,7 +143,6 @@ export const User = () => {
                 borderRadius: '20px',
                 padding: '16px',
                 boxShadow: '2',
-                width: '260px',
               }}
             >
               <Box
@@ -149,7 +151,9 @@ export const User = () => {
               >
                 好きなイベントのタイプ
               </Box>
-              <Box>{user.favoriteType}</Box>
+              <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                {user.favoriteType}
+              </Box>
             </Box>
           )}
 
@@ -162,7 +166,6 @@ export const User = () => {
                 borderRadius: '20px',
                 padding: '16px',
                 boxShadow: '2',
-                width: '260px',
               }}
             >
               <Box
@@ -171,7 +174,9 @@ export const User = () => {
               >
                 得意な謎、配役等
               </Box>
-              <Box>{user.strongPoints}</Box>
+              <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                {user.strongPoints}
+              </Box>
             </Box>
           )}
 
@@ -184,7 +189,6 @@ export const User = () => {
                 borderRadius: '20px',
                 padding: '16px',
                 boxShadow: '2',
-                width: '260px',
               }}
             >
               <Box
@@ -193,15 +197,16 @@ export const User = () => {
               >
                 よく行く、推しの団体
               </Box>
-              <Box>{user.favoriteGroup}</Box>
+              <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                {user.favoriteGroup}
+              </Box>
             </Box>
           )}
 
           {/* 戦績 */}
           {!!user.winRate && (
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-              <Box component={'label'}>脱出成功率</Box>
-              <Box>{user.winRate}</Box>
+            <Box sx={{ display: 'flex', margin: 'auto' }}>
+              <Box>脱出成功率{user.winRate}%</Box>
             </Box>
           )}
         </Box>

@@ -257,16 +257,19 @@ export const EditEventDialogContent = ({
           control={control}
           name="event.member"
           label="同行メンバー"
+          multiline={true}
         />
         <TextFieldRHF<EventSchemaType>
           control={control}
           name="event.memo"
           label="詳細memo"
+          multiline={true}
         />
         <TextFieldRHF<EventSchemaType>
           control={control}
           name="event.diary"
           label="イベントレポート"
+          multiline={true}
         />
         <Box sx={{ width: '100%' }}>
           <Box sx={{ fontSize: 'small', padding: '6px' }}>イベントフォト</Box>
@@ -345,7 +348,7 @@ export const EditEventDialogContent = ({
             variant="contained"
             sx={{ width: '150px', marginTop: '16px', margin: '8px' }}
           >
-            編集
+            保存
           </Button>
         </Box>
       </Box>

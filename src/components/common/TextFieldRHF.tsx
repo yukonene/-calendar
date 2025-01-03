@@ -8,11 +8,14 @@ type Props<T extends FieldValues> = {
   label: string;
   type?: HTMLInputTypeAttribute | undefined;
   startIcon?: ReactNode;
+  multiline?: boolean;
+  autoComplete?: string;
 };
 
 //<>内はタイプ
 export const TextFieldRHF = <T extends FieldValues>(props: Props<T>) => {
-  const { control, name, label, type, startIcon } = props;
+  const { control, name, label, type, startIcon, multiline, autoComplete } =
+    props;
   return (
     <Controller
       control={control}
@@ -31,6 +34,8 @@ export const TextFieldRHF = <T extends FieldValues>(props: Props<T>) => {
             variant="standard"
             fullWidth
             helperText={error?.message}
+            multiline={multiline}
+            autoComplete={autoComplete}
             error={!!error}
             slotProps={{
               input: {
