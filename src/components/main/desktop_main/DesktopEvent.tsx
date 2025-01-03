@@ -8,7 +8,6 @@ import { useEventsContext } from '../common/EventsProvider';
 import { EventT } from '@/types/EventT';
 import ModeEditTwoToneIcon from '@mui/icons-material/ModeEditTwoTone';
 import { DeleteEventDialog } from '../common/delete_event_dialog/DeleteEventDialog';
-import { EventPhoto } from '@prisma/client';
 import { EventPhotoT } from '@/types/EventPhotoT';
 
 type Props = {
@@ -16,20 +15,22 @@ type Props = {
 };
 
 export const DesktopEvent = ({ eventId }: Props) => {
-  const { getEvents } = useEventsContext();
+  const { getEventInfoList } = useEventsContext();
 
-  const [event, setEvent] = useState<EventT>();
+  const [eventInfo, setEventInfo] = useState<{
+    event: EventT;
+    eventPhotos: EventPhotoT[];
+  }>();
   const [eventPhotos, setEventPhotos] = useState<EventPhotoT[]>([]);
 
-  const getEvent = useCallback(() => {
+  const getEventInfo = useCallback(() => {
     if (!eventId) {
       return;
     } else {
       axios
         .get<GetEventResponseSuccessBody>(`/api/events/${eventId}`)
         .then((res) => {
-          setEvent(res.data.event); //GetEventsResponseSuccessBody=res.data
-          setEventPhotos(res.data.eventPhotos);
+          setEventInfo(res.data); //GetEventsResponseSuccessBody=res.data
         })
 
         .catch((e) => {
@@ -39,14 +40,14 @@ export const DesktopEvent = ({ eventId }: Props) => {
   }, [eventId]);
 
   useEffect(() => {
-    getEvent();
-  }, [eventId, getEvent]);
+    getEventInfo();
+  }, [eventId, getEventInfo]);
 
   const [editEventDialogOpen, setEditEventDialogOpen] = useState(false);
   const handleEditEventClick = useCallback(() => {
     setEditEventDialogOpen(true);
-    setEvent(event);
-  }, [setEvent, event]);
+    setEventInfo(eventInfo);
+  }, [setEventInfo, eventInfo]);
 
   const [isDeleteEventDialogOpen, setIsDeleteEventDialogOpen] = useState(false);
 
@@ -60,7 +61,7 @@ export const DesktopEvent = ({ eventId }: Props) => {
 
   //ローディング中のevent内が空の時にCircularProgressを表示する
   //これによって一番下のretrunが表示されなくなる為event=undifindを避けられる
-  if (!event) {
+  if (!eventInfo) {
     return (
       <Box sx={{ display: 'flex' }}>
         <CircularProgress />
@@ -87,35 +88,37 @@ export const DesktopEvent = ({ eventId }: Props) => {
         <Box component={'label'} sx={{ fontSize: 'small' }}>
           イベントタイトル
         </Box>
-        <Box>{event.title}</Box>
+        <Box>{eventInfo.event.title}</Box>
       </Box>
 
       {/* イベント日時 */}
       <Box sx={{ display: 'flex' }}>
-        <Box>{format(new Date(event.startDateTime), ' MM月dd日HH時mm分')}</Box>
         <Box>
-          {!!event.endDateTime &&
-            format(new Date(event.endDateTime), '~ MM月dd日HH時mm分')}
+          {format(new Date(eventInfo.event.startDateTime), ' MM月dd日HH時mm分')}
+        </Box>
+        <Box>
+          {!!eventInfo.event.endDateTime &&
+            format(new Date(eventInfo.event.endDateTime), '~ MM月dd日HH時mm分')}
         </Box>
       </Box>
 
       {/* 開催場所 */}
-      {!!event.place && (
+      {!!eventInfo.event.place && (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <Box component={'label'} sx={{ fontSize: 'small' }}>
             開催場所
           </Box>
-          <Box>{event.place}</Box>
+          <Box>{eventInfo.event.place}</Box>
         </Box>
       )}
 
       {/* URL */}
-      {!!event.url && (
+      {!!eventInfo.event.url && (
         <Link
           component={'button'}
           onClick={() => {
-            if (!!event.url) {
-              window.open(event.url);
+            if (!!eventInfo.event.url) {
+              window.open(eventInfo.event.url);
             }
           }}
         >
@@ -124,32 +127,32 @@ export const DesktopEvent = ({ eventId }: Props) => {
       )}
 
       {/* メンバー */}
-      {!!event.member && (
+      {!!eventInfo.event.member && (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <Box component={'label'} sx={{ fontSize: 'small' }}>
             同行メンバー
           </Box>
-          <Box>{event.member}</Box>
+          <Box>{eventInfo.event.member}</Box>
         </Box>
       )}
 
       {/* memo */}
-      {!!event.memo && (
+      {!!eventInfo.event.memo && (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <Box component={'label'} sx={{ fontSize: 'small' }}>
             詳細
           </Box>
-          <Box>{event.memo}</Box>
+          <Box>{eventInfo.event.memo}</Box>
         </Box>
       )}
 
       {/* 日記 */}
-      {!!event.diary && (
+      {!!eventInfo.event.diary && (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <Box component={'label'} sx={{ fontSize: 'small' }}>
             イベントレポート
           </Box>
-          <Box>{event.diary}</Box>
+          <Box>{eventInfo.event.diary}</Box>
         </Box>
       )}
 
@@ -163,12 +166,14 @@ export const DesktopEvent = ({ eventId }: Props) => {
       )}
 
       {/* 成功・失敗 */}
-      {event.success != null && (
+      {eventInfo.event.success != null && (
         <Box sx={{ display: 'flex', flexDirection: 'row', gap: '4px' }}>
-          <Box component={'label'}>{event.success != null && '脱出'}</Box>
+          <Box component={'label'}>
+            {eventInfo.event.success != null && '脱出'}
+          </Box>
           <Box>
             {/* null undefined以外 */}
-            {event.success ? '成功!!' : '失敗'}
+            {eventInfo.event.success ? '成功!!' : '失敗'}
           </Box>
         </Box>
       )}
@@ -187,11 +192,10 @@ export const DesktopEvent = ({ eventId }: Props) => {
         編集
       </Button>
       <EditEventDialog
-        event={event}
+        eventInfo={eventInfo}
         isOpen={editEventDialogOpen}
         onClose={() => setEditEventDialogOpen(false)}
-        afterSaveEvent={getEvent}
-        eventPhotos={eventPhotos}
+        afterSaveEvent={getEventInfo}
       />
       <Box sx={{ display: 'flex' }}>
         <Link
@@ -205,10 +209,10 @@ export const DesktopEvent = ({ eventId }: Props) => {
       </Box>
 
       <DeleteEventDialog
-        event={event}
+        eventInfo={eventInfo}
         isOpen={isDeleteEventDialogOpen}
         onClose={handleClose}
-        afterDeleteEvent={getEvents}
+        afterDeleteEvent={getEventInfoList}
       />
     </Box>
   );

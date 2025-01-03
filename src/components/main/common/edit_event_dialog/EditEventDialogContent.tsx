@@ -72,16 +72,17 @@ export type EventSchemaType = z.infer<typeof eventScheme>;
 
 type Props = {
   onClose: () => void;
-  event: EventT;
+  eventInfo: {
+    event: EventT;
+    eventPhotos: EventPhotoT[];
+  };
   afterSaveEvent: () => void;
-  eventPhotos: EventPhotoT[];
 };
 
 export const EditEventDialogContent = ({
   onClose,
-  event,
+  eventInfo,
   afterSaveEvent,
-  eventPhotos,
 }: Props) => {
   const {
     //何を使うか
@@ -96,19 +97,21 @@ export const EditEventDialogContent = ({
     criteriaMode: 'all',
     defaultValues: {
       event: {
-        title: event.title,
-        startDateTime: new Date(event.startDateTime),
-        endDateTime: event.endDateTime ? new Date(event.endDateTime) : null,
-        place: event.place,
-        url: event.url,
-        member: event.member,
-        memo: event.memo,
-        diary: event.diary,
+        title: eventInfo.event.title,
+        startDateTime: new Date(eventInfo.event.startDateTime),
+        endDateTime: eventInfo.event.endDateTime
+          ? new Date(eventInfo.event.endDateTime)
+          : null,
+        place: eventInfo.event.place,
+        url: eventInfo.event.url,
+        member: eventInfo.event.member,
+        memo: eventInfo.event.memo,
+        diary: eventInfo.event.diary,
         //boolean型に戻した↓
         success:
-          event.success === null
+          eventInfo.event.success === null
             ? null
-            : (event.success.toString() as 'true' | 'false'),
+            : (eventInfo.event.success.toString() as 'true' | 'false'),
       },
       eventPhotos: [null], //ファイルの初期値はnullにすること
     },
@@ -173,7 +176,7 @@ export const EditEventDialogContent = ({
       };
 
       await axios.patch<PatchEventResponseSuccessBody>(
-        `/api/events/${event.id}`,
+        `/api/events/${eventInfo.event.id}`,
         patchData
       ); //patchする
       setSnackbarMessage({
@@ -275,7 +278,7 @@ export const EditEventDialogContent = ({
                 key={i}
                 setValue={setValue}
                 index={i}
-                eventPhoto={eventPhotos[0]}
+                eventPhoto={eventInfo.eventPhotos[0]}
               />
             );
           })}

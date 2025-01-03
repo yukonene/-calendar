@@ -4,23 +4,29 @@ import { Box, DialogTitle, DialogActions, Button } from '@mui/material';
 import { useCallback } from 'react';
 import { DeleteEventResponseSuccessBody } from '@/pages/api/events/[id]';
 import axios from 'axios';
+import { EventPhotoT } from '@/types/EventPhotoT';
 
 type Props = {
   onClose: () => void;
-  event: EventT;
+  eventInfo: {
+    event: EventT;
+    eventPhotos: EventPhotoT[];
+  };
   afterDeleteEvent: () => void;
 };
 
 export const DeleteEventDialogContent = ({
   onClose,
-  event,
+  eventInfo,
   afterDeleteEvent,
 }: Props) => {
   const { setSnackbarMessage, setIsSnackbarOpen } = useSnackbarContext();
 
   const deleteEvent = useCallback(() => {
     axios
-      .delete<DeleteEventResponseSuccessBody>(`/api/events/${event.id}`) //deleteする
+      .delete<DeleteEventResponseSuccessBody>(
+        `/api/events/${eventInfo.event.id}`
+      ) //deleteする
       .then(() => {
         setSnackbarMessage({
           severity: 'success',
@@ -39,7 +45,7 @@ export const DeleteEventDialogContent = ({
       });
   }, [
     afterDeleteEvent,
-    event.id,
+    eventInfo.event.id,
     onClose,
     setIsSnackbarOpen,
     setSnackbarMessage,

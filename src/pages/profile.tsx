@@ -32,7 +32,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       include: { events: true },
     });
     if (!isEmailVerified) {
-      res;
       return { redirect: { destination: '/login', permanent: false } };
     }
     if (!user) {

@@ -6,10 +6,12 @@ import { auth } from '@/lib/firebase/firebaseAdminClient';
 import { number, z } from 'zod';
 import { EventT } from '@/types/EventT';
 import { bucket } from '@/lib/cloudStorage';
+import { endOfMonth, startOfMonth } from 'date-fns';
+import { EventPhotoT } from '@/types/EventPhotoT';
 
 //jsonの形でresで送ったもののタイプ。number,string,null,boolean
 export type GetEventsResponseSuccessBody = {
-  events: EventT[];
+  eventInfoList: { event: EventT; eventPhotos: EventPhotoT[] }[];
 };
 
 export type PostEventRequestBody = {
@@ -67,12 +69,35 @@ export default async function handler(
     }
 
     if (req.method === 'GET') {
+      //////////////////クエリの受け取り////////////////////////////////////////
+      const now = new Date();
+      //startDateTimeStrがある場合はtoISOStringで変換された文字列になっている
+      const startDateTimeStr = req.query.startDateTime;
+      //選択したイベントの開始日時をDate型にして返す。
+      // ページを開いた瞬間のイベントを選択していない状態、もしくはイベントが一つもない場合、今日の月を返す
+      const startDatetime =
+        !!startDateTimeStr && typeof startDateTimeStr === 'string'
+          ? new Date(startDateTimeStr)
+          : startOfMonth(now);
+      //endDateTimeStrがある場合はtoISOStringで変換された文字列になっている
+      const endDateTimeStr = req.query.endDateTime;
+      const endDateTime =
+        !!endDateTimeStr && typeof endDateTimeStr === 'string'
+          ? new Date(endDateTimeStr)
+          : endOfMonth(now);
+      console.log(startDateTimeStr);
+      // gte=greater than or equal（●●以上） lte=less than or equal(●●以下)
       const eventsInDB = await prisma.event.findMany({
         where: {
           userId: user.id,
+          startDateTime: {
+            gte: startDatetime,
+            lte: endDateTime,
+          },
         },
         include: { eventPhotos: true },
       });
+
       const options = {
         //as constをつけて、そのもののみ受け付けるようにする
         version: 'v4' as const,
@@ -81,37 +106,44 @@ export default async function handler(
       };
 
       //mapの関数内で非同期処理のasync、awaitと使うとき、map全体をawait Promise.allで囲うこと
-      const events = await Promise.all(
+      const eventInfoList = await Promise.all(
         eventsInDB.map(async (event) => {
           let eventPhotoUrl = null;
+          let eventPhotoFileKey = null;
           if (event.eventPhotos.length > 0) {
             const eventPhoto = event.eventPhotos[0]; //1個しか入らない設定だから
             const [url] = await bucket
               .file(eventPhoto.fileKey)
               .getSignedUrl(options);
             eventPhotoUrl = url;
+            eventPhotoFileKey = eventPhoto.fileKey;
           }
           return {
-            id: event.id,
-            title: event.title,
-            //jsonは文字列の一つの形式の為date型を送れない。
-            // そのためstring型にするが、stringだとSat Dec 14 2024 20:36:06 GMT+0900 (日本標準時)でわかりにくい為、
-            // toISOSting()でISO8601の表示形式にする'2024-12-14T11:36:06.137Z'
-            startDateTime: event.startDateTime.toISOString(),
-            endDateTime: event.endDateTime?.toISOString() || null,
-            place: event.place,
-            url: event.url,
-            member: event.member,
-            memo: event.memo,
-            diary: event.diary,
-            success: event.success,
-            eventPhotoUrl: eventPhotoUrl,
+            event: {
+              id: event.id,
+              title: event.title,
+              //jsonは文字列の一つの形式の為date型を送れない。
+              // そのためstring型にするが、stringだとSat Dec 14 2024 20:36:06 GMT+0900 (日本標準時)でわかりにくい為、
+              // toISOSting()でISO8601の表示形式にする'2024-12-14T11:36:06.137Z'
+              startDateTime: event.startDateTime.toISOString(),
+              endDateTime: event.endDateTime?.toISOString() || null,
+              place: event.place,
+              url: event.url,
+              member: event.member,
+              memo: event.memo,
+              diary: event.diary,
+              success: event.success,
+            },
+            eventPhotos:
+              !!eventPhotoUrl && !!eventPhotoFileKey
+                ? [{ url: eventPhotoUrl, fileKey: eventPhotoFileKey }]
+                : [],
           };
         })
       );
 
       const data: GetEventsResponseSuccessBody = {
-        events: events,
+        eventInfoList: eventInfoList,
       };
 
       res.status(200).json(data);

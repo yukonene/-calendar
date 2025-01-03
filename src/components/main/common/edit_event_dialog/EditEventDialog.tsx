@@ -4,19 +4,20 @@ import { EventT } from '@/types/EventT';
 import { EventPhotoT } from '@/types/EventPhotoT';
 
 type Props = {
-  event: EventT;
+  eventInfo: {
+    event: EventT;
+    eventPhotos: EventPhotoT[];
+  };
   isOpen: boolean;
   onClose: () => void;
   afterSaveEvent: () => void;
-  eventPhotos: EventPhotoT[];
 };
 
 export const EditEventDialog = ({
-  event,
+  eventInfo,
   isOpen,
   onClose,
   afterSaveEvent,
-  eventPhotos,
 }: Props) => {
   return (
     <>
@@ -44,10 +45,9 @@ export const EditEventDialog = ({
         maxWidth={'sm'}
       >
         <EditEventDialogContent
-          event={event}
+          eventInfo={eventInfo}
           onClose={onClose}
           afterSaveEvent={afterSaveEvent}
-          eventPhotos={eventPhotos}
         />
       </Dialog>
     </>

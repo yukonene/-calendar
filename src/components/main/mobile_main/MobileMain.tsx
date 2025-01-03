@@ -9,36 +9,45 @@ import { MobileDateEventsDialog } from './MobileDateEventsDialog';
 import { EventT } from '@/types/EventT';
 import { isSameDay } from 'date-fns';
 import { EventClickArg } from '@fullcalendar/core/index.js';
+import { EventPhotoT } from '@/types/EventPhotoT';
 
 export const MobileMain = () => {
-  const { events } = useEventsContext();
+  const { eventInfoList, handlePrevButton, handleNextButton, calendarRef } =
+    useEventsContext();
   const [isMobileDateEventsDialogOpen, setIsMobileDateEventsDialogOpen] =
     useState(false);
   const [date, setDate] = useState<Date>(); //モーダルに日付データを渡す
 
-  const [dateEvents, setDateEvents] = useState<EventT[]>([]);
+  const [dateEventInfoList, setDateEventInfoList] = useState<
+    {
+      event: EventT;
+      eventPhotos: EventPhotoT[];
+    }[]
+  >([]);
 
   useEffect(() => {
     if (!!date) {
-      const clickedDateEvents = events.filter((event) => {
-        return isSameDay(new Date(event.startDateTime), date);
+      const clickedDateEvents = eventInfoList.filter((eventInfo) => {
+        return isSameDay(new Date(eventInfo.event.startDateTime), date);
       });
-      setDateEvents(clickedDateEvents);
+      setDateEventInfoList(clickedDateEvents);
     } else {
-      setDateEvents([]);
+      setDateEventInfoList([]);
     }
-  }, [events, date]);
+  }, [eventInfoList, date]);
 
   const eventList = useMemo(() => {
-    return events.map((event) => {
+    return eventInfoList.map((eventInfo) => {
       return {
-        id: event.id.toString(), //typeを文字列に変換
-        title: event.title,
-        start: new Date(event.startDateTime),
-        end: !!event.endDateTime ? new Date(event.endDateTime) : undefined,
+        id: eventInfo.event.id.toString(), //typeを文字列に変換
+        title: eventInfo.event.title,
+        start: new Date(eventInfo.event.startDateTime),
+        end: !!eventInfo.event.endDateTime
+          ? new Date(eventInfo.event.endDateTime)
+          : undefined,
       };
     });
-  }, [events]);
+  }, [eventInfoList]);
 
   //日付モーダルopen時
   const handleDateClick = useCallback((info: DateClickArg) => {
@@ -76,13 +85,29 @@ export const MobileMain = () => {
         events={eventList}
         dateClick={handleDateClick}
         eventClick={handleEventClick}
+        ref={calendarRef}
+        customButtons={{
+          prevWithOnClick: {
+            text: '<',
+            click: handlePrevButton,
+          },
+          nextWithOnClick: {
+            text: '>',
+            click: handleNextButton,
+          },
+        }}
+        headerToolbar={{
+          left: 'title',
+          center: '',
+          right: 'prevWithOnClick,nextWithOnClick',
+        }}
       />
 
       {!!date && (
         <MobileDateEventsDialog
           isOpen={isMobileDateEventsDialogOpen}
           onClose={handleCloseDialog}
-          dateEvents={dateEvents}
+          dateEventInfoList={dateEventInfoList}
           date={date}
         />
       )}

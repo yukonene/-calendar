@@ -1,16 +1,20 @@
 import { Dialog } from '@mui/material';
 import { EventT } from '@/types/EventT';
 import { DeleteEventDialogContent } from './DeleteEventDialogContent';
+import { EventPhotoT } from '@/types/EventPhotoT';
 
 type Props = {
-  event: EventT;
+  eventInfo: {
+    event: EventT;
+    eventPhotos: EventPhotoT[];
+  };
   isOpen: boolean;
   onClose: () => void;
   afterDeleteEvent: () => void;
 };
 
 export const DeleteEventDialog = ({
-  event,
+  eventInfo,
   isOpen,
   onClose,
   afterDeleteEvent,
@@ -24,7 +28,7 @@ export const DeleteEventDialog = ({
       maxWidth={'sm'}
     >
       <DeleteEventDialogContent
-        event={event}
+        eventInfo={eventInfo}
         onClose={onClose}
         afterDeleteEvent={afterDeleteEvent}
       />

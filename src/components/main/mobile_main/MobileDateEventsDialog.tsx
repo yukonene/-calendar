@@ -21,40 +21,50 @@ import { DeleteEventDialog } from '../common/delete_event_dialog/DeleteEventDial
 import { NewEventDialog } from '@/components/main/common/new_event_dialog/NewEventDialog';
 import AddIcon from '@mui/icons-material/Add';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import { EventPhotoT } from '@/types/EventPhotoT';
 
 type Props = {
-  dateEvents: EventT[];
+  dateEventInfoList: {
+    event: EventT;
+    eventPhotos: EventPhotoT[];
+  }[];
   isOpen: boolean;
   onClose: () => void;
   date: Date;
 };
 
 export const MobileDateEventsDialog = ({
-  dateEvents,
+  dateEventInfoList,
   isOpen,
   onClose,
   date,
 }: Props) => {
-  const [selectedDateEvent, setSelectedDateEvent] = useState<EventT>();
+  const [selectedDateEventInfo, setSelectedDateEventInfo] = useState<{
+    event: EventT;
+    eventPhotos: EventPhotoT[];
+  }>();
   const [isEditEventDialogOpen, setIsEditEventDialogOpen] = useState(false);
-  const { getEvents } = useEventsContext();
+  const { getEventInfoList } = useEventsContext();
 
   const [isNewEventDialogOpen, setIsNewEventDialogOpen] = useState(false);
 
   //mobileは個々にボタンを作っていない為、引数で日付を指定してあげる
   const handleEditEventClick = useCallback(
-    (dateEvent: EventT) => {
+    (dateEventInfo: { event: EventT; eventPhotos: EventPhotoT[] }) => {
       setIsEditEventDialogOpen(true);
-      setSelectedDateEvent(dateEvent);
+      setSelectedDateEventInfo(dateEventInfo);
     },
-    [setIsEditEventDialogOpen, setSelectedDateEvent]
+    [setIsEditEventDialogOpen, setSelectedDateEventInfo]
   );
 
   const [isDeleteEventDialogOpen, setIsDeleteEventDialogOpen] = useState(false);
-  const handleDeleteEventClick = useCallback((dateEvent: EventT) => {
-    setIsDeleteEventDialogOpen(true);
-    setSelectedDateEvent(dateEvent);
-  }, []);
+  const handleDeleteEventClick = useCallback(
+    (dateEventInfo: { event: EventT; eventPhotos: EventPhotoT[] }) => {
+      setIsDeleteEventDialogOpen(true);
+      setSelectedDateEventInfo(dateEventInfo);
+    },
+    []
+  );
 
   return (
     <Dialog
@@ -95,15 +105,15 @@ export const MobileDateEventsDialog = ({
           setIsNewEventDialogOpen(false);
         }}
         date={date}
-        afterSaveEvent={getEvents}
+        afterSaveEvent={getEventInfoList}
       />
       {/* イベントアコーディオン */}
-      {dateEvents.map((dateEvent) => {
+      {dateEventInfoList.map((dateEventInfo) => {
         return (
           <Accordion
             // コンポーネントをmapで繰り返し表示する時、keyを必ず設定する
             // その時keyはユニークな値にすること　大外のboxに設定
-            key={dateEvent.id}
+            key={dateEventInfo.event.id}
             elevation={0}
           >
             <AccordionSummary
@@ -113,7 +123,7 @@ export const MobileDateEventsDialog = ({
             >
               {/* イベントタイトル */}
               <Typography component="span" sx={{ fontWeight: 'bold' }}>
-                {dateEvent.title}
+                {dateEventInfo.event.title}
               </Typography>
             </AccordionSummary>
             <AccordionDetails
@@ -133,16 +143,22 @@ export const MobileDateEventsDialog = ({
                 </Box>
                 <Box sx={{ display: 'flex' }}>
                   <Box>
-                    {format(new Date(dateEvent.startDateTime), ' M月d日H時m分')}
+                    {format(
+                      new Date(dateEventInfo.event.startDateTime),
+                      ' M月d日H時m分'
+                    )}
                   </Box>
                   <Box>
-                    {!!dateEvent.endDateTime &&
-                      format(new Date(dateEvent.endDateTime), '- M月d日H時m分')}
+                    {!!dateEventInfo.event.endDateTime &&
+                      format(
+                        new Date(dateEventInfo.event.endDateTime),
+                        '- M月d日H時m分'
+                      )}
                   </Box>
                 </Box>
               </Box>
               {/* 開催場所 */}
-              {!!dateEvent.place && (
+              {!!dateEventInfo.event.place && (
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                   <Box
                     component={'label'}
@@ -150,16 +166,16 @@ export const MobileDateEventsDialog = ({
                   >
                     開催場所
                   </Box>
-                  <Box>{dateEvent.place}</Box>
+                  <Box>{dateEventInfo.event.place}</Box>
                 </Box>
               )}
               {/* URL */}
-              {!!dateEvent.url && (
+              {!!dateEventInfo.event.url && (
                 <Link
                   component={'button'}
                   onClick={() => {
-                    if (!!dateEvent.url) {
-                      window.open(dateEvent.url);
+                    if (!!dateEventInfo.event.url) {
+                      window.open(dateEventInfo.event.url);
                     }
                   }}
                 >
@@ -167,7 +183,7 @@ export const MobileDateEventsDialog = ({
                 </Link>
               )}
               {/* メンバー */}
-              {!!dateEvent.member && (
+              {!!dateEventInfo.event.member && (
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                   <Box
                     component={'label'}
@@ -175,11 +191,11 @@ export const MobileDateEventsDialog = ({
                   >
                     同行メンバー
                   </Box>
-                  <Box>{dateEvent.member}</Box>
+                  <Box>{dateEventInfo.event.member}</Box>
                 </Box>
               )}
               {/* memo */}
-              {!!dateEvent.memo && (
+              {!!dateEventInfo.event.memo && (
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                   <Box
                     component={'label'}
@@ -187,12 +203,12 @@ export const MobileDateEventsDialog = ({
                   >
                     詳細
                   </Box>
-                  <Box>{dateEvent.memo}</Box>
+                  <Box>{dateEventInfo.event.memo}</Box>
                 </Box>
               )}
 
               {/* 日記 */}
-              {!!dateEvent.diary && (
+              {!!dateEventInfo.event.diary && (
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                   <Box
                     component={'label'}
@@ -200,12 +216,12 @@ export const MobileDateEventsDialog = ({
                   >
                     イベントレポート
                   </Box>
-                  <Box>{dateEvent.diary}</Box>
+                  <Box>{dateEventInfo.event.diary}</Box>
                 </Box>
               )}
 
               {/* 成功・失敗 */}
-              {dateEvent.success != null && (
+              {dateEventInfo.event.success != null && (
                 <Box
                   sx={{
                     display: 'flex',
@@ -215,11 +231,11 @@ export const MobileDateEventsDialog = ({
                   }}
                 >
                   <Box component={'label'}>
-                    {dateEvent.success != null && '脱出'}
+                    {dateEventInfo.event.success != null && '脱出'}
                   </Box>
                   <Box>
                     {/* null undefined以外 */}
-                    {dateEvent.success ? '成功!!' : '失敗'}
+                    {dateEventInfo.event.success ? '成功!!' : '失敗'}
                   </Box>
                 </Box>
               )}
@@ -227,7 +243,7 @@ export const MobileDateEventsDialog = ({
               <Box sx={{ display: 'flex' }}>
                 <Link
                   component={'button'}
-                  onClick={() => handleDeleteEventClick(dateEvent)}
+                  onClick={() => handleDeleteEventClick(dateEventInfo)}
                   variant={'body2'}
                   sx={{
                     marginRight: 'auto',
@@ -245,7 +261,7 @@ export const MobileDateEventsDialog = ({
                     marginTop: '16px',
                     marginLeft: 'auto',
                   }}
-                  onClick={() => handleEditEventClick(dateEvent)}
+                  onClick={() => handleEditEventClick(dateEventInfo)}
                   startIcon={<ModeEditTwoToneIcon />}
                 >
                   編集
@@ -255,25 +271,25 @@ export const MobileDateEventsDialog = ({
           </Accordion>
         );
       })}
-      {!!selectedDateEvent && (
+      {!!selectedDateEventInfo && (
         <EditEventDialog
-          event={selectedDateEvent}
+          eventInfo={selectedDateEventInfo}
           isOpen={isEditEventDialogOpen}
           onClose={() => {
             setIsEditEventDialogOpen(false);
-            setSelectedDateEvent(undefined);
+            setSelectedDateEventInfo(undefined);
           }}
-          afterSaveEvent={getEvents}
+          afterSaveEvent={getEventInfoList}
         />
       )}
-      {!!selectedDateEvent && (
+      {!!selectedDateEventInfo && (
         <DeleteEventDialog
-          event={selectedDateEvent}
+          eventInfo={selectedDateEventInfo}
           isOpen={isDeleteEventDialogOpen}
           onClose={() => setIsDeleteEventDialogOpen(false)}
           afterDeleteEvent={() => {
-            getEvents();
-            if (dateEvents.length === 1) {
+            getEventInfoList();
+            if (dateEventInfoList.length === 1) {
               onClose();
             }
           }}
