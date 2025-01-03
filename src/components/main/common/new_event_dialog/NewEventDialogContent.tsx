@@ -158,7 +158,6 @@ export const NewEventDialogContent = ({
           control={control}
           name="url"
           label="イベントページURL"
-          // リンクつける
         />
         <TextFieldRHF<EventSchemaType>
           control={control}

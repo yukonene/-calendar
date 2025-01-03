@@ -2,12 +2,14 @@ import { GetEventResponseSuccessBody } from '@/pages/api/events/[id]';
 import { Box, Button, CircularProgress, Link } from '@mui/material';
 import axios from 'axios';
 import { format } from 'date-fns';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { EditEventDialog } from '../common/edit_event_dialog/EditEventDialog';
 import { useEventsContext } from '../common/EventsProvider';
 import { EventT } from '@/types/EventT';
 import ModeEditTwoToneIcon from '@mui/icons-material/ModeEditTwoTone';
 import { DeleteEventDialog } from '../common/delete_event_dialog/DeleteEventDialog';
+import { EventPhoto } from '@prisma/client';
+import { EventPhotoT } from '@/types/EventPhotoT';
 
 type Props = {
   eventId: number | undefined;
@@ -17,6 +19,7 @@ export const DesktopEvent = ({ eventId }: Props) => {
   const { getEvents } = useEventsContext();
 
   const [event, setEvent] = useState<EventT>();
+  const [eventPhotos, setEventPhotos] = useState<EventPhotoT[]>([]);
 
   const getEvent = useCallback(() => {
     if (!eventId) {
@@ -26,6 +29,7 @@ export const DesktopEvent = ({ eventId }: Props) => {
         .get<GetEventResponseSuccessBody>(`/api/events/${eventId}`)
         .then((res) => {
           setEvent(res.data.event); //GetEventsResponseSuccessBody=res.data
+          setEventPhotos(res.data.eventPhotos);
         })
 
         .catch((e) => {
@@ -149,6 +153,15 @@ export const DesktopEvent = ({ eventId }: Props) => {
         </Box>
       )}
 
+      {/* イベントフォト */}
+      {eventPhotos.length > 0 && (
+        <img
+          src={eventPhotos[0].url}
+          alt="eventPhoto"
+          style={{ objectFit: 'contain', width: '100%', height: '250px' }}
+        />
+      )}
+
       {/* 成功・失敗 */}
       {event.success != null && (
         <Box sx={{ display: 'flex', flexDirection: 'row', gap: '4px' }}>
@@ -178,6 +191,7 @@ export const DesktopEvent = ({ eventId }: Props) => {
         isOpen={editEventDialogOpen}
         onClose={() => setEditEventDialogOpen(false)}
         afterSaveEvent={getEvent}
+        eventPhotos={eventPhotos}
       />
       <Box sx={{ display: 'flex' }}>
         <Link

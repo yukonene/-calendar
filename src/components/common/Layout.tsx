@@ -47,10 +47,21 @@ export default function Layout({ children }: { children: ReactNode }) {
         sx={{
           display: 'flex',
           borderBottom: '1px solid gray',
-          // padding: '10px',
           flexDirection: 'column',
         }}
       >
+        <Link
+          href="/"
+          passHref
+          style={{
+            fontSize: '30px',
+            fontWeight: 'bolder',
+            padding: '6px',
+            color: '#008080',
+          }}
+        >
+          {process.env.NEXT_PUBLIC_APP_TITLE}
+        </Link>
         <Box
           sx={{
             marginLeft: 'auto',

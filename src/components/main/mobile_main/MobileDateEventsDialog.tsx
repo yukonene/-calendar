@@ -166,17 +166,6 @@ export const MobileDateEventsDialog = ({
                   イベント詳細ページ
                 </Link>
               )}
-              {/* {!!dateEvent.url && (
-                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                  <Box
-                    component={'label'}
-                    sx={{ fontSize: 'small', color: 'gray' }}
-                  >
-                    URL
-                  </Box>
-                  <Box>{dateEvent.url}</Box>
-                </Box>
-              )} */}
               {/* メンバー */}
               {!!dateEvent.member && (
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>

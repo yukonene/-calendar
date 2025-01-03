@@ -3,22 +3,13 @@ import { getCookie } from 'cookies-next';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '@/lib/prisma';
 import { auth } from '@/lib/firebase/firebaseAdminClient';
-import { z } from 'zod';
+import { number, z } from 'zod';
+import { EventT } from '@/types/EventT';
+import { bucket } from '@/lib/cloudStorage';
 
 //jsonの形でresで送ったもののタイプ。number,string,null,boolean
 export type GetEventsResponseSuccessBody = {
-  events: {
-    id: number;
-    title: string;
-    startDateTime: string;
-    endDateTime: string | null;
-    place: string | null;
-    url: string | null;
-    member: string | null;
-    memo: string | null;
-    diary: string | null;
-    success: boolean | null;
-  }[];
+  events: EventT[];
 };
 
 export type PostEventRequestBody = {
@@ -76,13 +67,30 @@ export default async function handler(
     }
 
     if (req.method === 'GET') {
-      const events = await prisma.event.findMany({
+      const eventsInDB = await prisma.event.findMany({
         where: {
           userId: user.id,
         },
+        include: { eventPhotos: true },
       });
-      const data: GetEventsResponseSuccessBody = {
-        events: events.map((event) => {
+      const options = {
+        //as constをつけて、そのもののみ受け付けるようにする
+        version: 'v4' as const,
+        action: 'read' as const,
+        expires: Date.now() + 5 * 60 * 1000,
+      };
+
+      //mapの関数内で非同期処理のasync、awaitと使うとき、map全体をawait Promise.allで囲うこと
+      const events = await Promise.all(
+        eventsInDB.map(async (event) => {
+          let eventPhotoUrl = null;
+          if (event.eventPhotos.length > 0) {
+            const eventPhoto = event.eventPhotos[0]; //1個しか入らない設定だから
+            const [url] = await bucket
+              .file(eventPhoto.fileKey)
+              .getSignedUrl(options);
+            eventPhotoUrl = url;
+          }
           return {
             id: event.id,
             title: event.title,
@@ -97,9 +105,15 @@ export default async function handler(
             memo: event.memo,
             diary: event.diary,
             success: event.success,
+            eventPhotoUrl: eventPhotoUrl,
           };
-        }),
+        })
+      );
+
+      const data: GetEventsResponseSuccessBody = {
+        events: events,
       };
+
       res.status(200).json(data);
 
       // ここからPOST

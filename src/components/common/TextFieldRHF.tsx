@@ -1,5 +1,5 @@
-import { TextField, TextFieldProps } from '@mui/material';
-import { HTMLInputTypeAttribute } from 'react';
+import { InputAdornment, TextField, TextFieldProps } from '@mui/material';
+import { HTMLInputTypeAttribute, ReactNode } from 'react';
 import { Control, Controller, FieldPath, FieldValues } from 'react-hook-form';
 
 type Props<T extends FieldValues> = {
@@ -7,11 +7,12 @@ type Props<T extends FieldValues> = {
   name: FieldPath<T>;
   label: string;
   type?: HTMLInputTypeAttribute | undefined;
+  startIcon?: ReactNode;
 };
 
 //<>内はタイプ
 export const TextFieldRHF = <T extends FieldValues>(props: Props<T>) => {
-  const { control, name, label, type } = props;
+  const { control, name, label, type, startIcon } = props;
   return (
     <Controller
       control={control}
@@ -31,6 +32,13 @@ export const TextFieldRHF = <T extends FieldValues>(props: Props<T>) => {
             fullWidth
             helperText={error?.message}
             error={!!error}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">{startIcon}</InputAdornment>
+                ),
+              },
+            }}
           />
         );
       }}

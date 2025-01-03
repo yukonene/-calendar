@@ -46,6 +46,7 @@ model Event{
   success       Boolean?
   createdAt     DateTime  @default(now()) @map(name: "created_at")
   updatedAt     DateTime  @updatedAt @map(name: "updated_at")
+
   user   User @relation(fields: [userId], references: [id]) //UsertabelにEventtableを紐付ける
   eventPhotos   EventPhoto[]
   userId Int
@@ -53,9 +54,11 @@ model Event{
 
 model EventPhoto{
   id           Int        @default(autoincrement()) @id
-  fileKey      String
+  fileKey      String  @unique
   originalFileName String
   event  Event @relation(fields: [eventId], references: [id]) 
+  createdAt     DateTime  @default(now()) @map(name: "created_at")
+  updatedAt     DateTime  @updatedAt @map(name: "updated_at")
   eventId      Int
 }
 //書き換えた際、"npm run migrate"で正式なSQLファイルを作り、DBへの反映をすること。 

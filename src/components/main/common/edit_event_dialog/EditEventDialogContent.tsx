@@ -2,127 +2,196 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import {
   Button,
-  CircularProgress,
   FormControlLabel,
   FormLabel,
   Radio,
   RadioGroup,
 } from '@mui/material';
 import { z } from 'zod';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
-import { Dispatch, SetStateAction } from 'react';
+import { ACCEPTED_FILE_TYPES, MAX_UPLOAD_SIZE } from '@/constants/imageSetting';
 import { TextFieldRHF } from '../../../common/TextFieldRHF';
 import { DatePickerRHF } from '../../../common/DatePickerRHF';
 import {
   PatchEventRequestBody,
   PatchEventResponseSuccessBody,
+  PostEventPhotoGenerateSignedUrlsRequestBody,
+  PostEventPhotoGenerateSignedUrlsResposeSuccessBody,
 } from '@/pages/api/events/[id]';
 import { EventT } from '@/types/EventT';
 import { useSnackbarContext } from '@/components/common/SnackbarProvider';
+import { EventPhoto } from './EventPhoto';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import { EventPhotoT } from '@/types/EventPhotoT';
+import { useRef, useState } from 'react';
 
-const eventScheme = z
-  .object({
-    title: z
-      .string()
-      .min(1, { message: 'イベントタイトルを入力してください' })
-      .max(50, { message: 'イベントタイトルが長すぎます' }),
-    startDateTime: z.date(),
-    endDateTime: z.date().nullable(), //nullかも
-    place: z.string().max(100, { message: '文字数超過' }).nullable(),
-    url: z.string().max(200, { message: '文字数超過' }).nullable(),
-    member: z.string().max(100, { message: '文字数超過' }).nullable(),
-    memo: z.string().max(255, { message: '文字数超過' }).nullable(),
-    diary: z.string().max(10000, { message: '文字数超過' }).nullable(),
-    success: z.union([z.literal('true'), z.literal('false')]).nullable(),
-    //literal・・・文字通りの　union・・・orの意味　typescriptの|
-    //radiocomponentでvalueがstringのみ使用可能だった為、一度string型に。
-  })
-  .refine(
-    //終了日時がnull、もしくは(||)終了時刻が開始日時より後の場合正しい入力値とする。
-    (data) => !data.endDateTime || data.startDateTime <= data.endDateTime,
-    {
-      message: '終了日時は開始日時の後に設定してください',
-      path: ['endDateTime'],
-    }
-  );
-type EventSchemaType = z.infer<typeof eventScheme>;
+import { PostGenerateSignedUrlsResposeSuccessBody } from '@/pages/api/generateSignedUrls';
+
+const eventScheme = z.object({
+  event: z
+    .object({
+      title: z
+        .string()
+        .min(1, { message: 'イベントタイトルを入力してください' })
+        .max(50, { message: 'イベントタイトルが長すぎます' }),
+      startDateTime: z.date(),
+      endDateTime: z.date().nullable(), //nullかも
+      place: z.string().max(100, { message: '文字数超過' }).nullable(),
+      url: z.string().max(200, { message: '文字数超過' }).nullable(),
+      member: z.string().max(100, { message: '文字数超過' }).nullable(),
+      memo: z.string().max(255, { message: '文字数超過' }).nullable(),
+      diary: z.string().max(10000, { message: '文字数超過' }).nullable(),
+      success: z.union([z.literal('true'), z.literal('false')]).nullable(),
+      //literal・・・文字通りの　union・・・orの意味　typescriptの|
+      //radiocomponentでvalueがstringのみ使用可能だった為、一度string型に。
+    })
+    .refine(
+      //終了日時がnull、もしくは(||)終了時刻が開始日時より後の場合正しい入力値とする。
+      (data) => !data.endDateTime || data.startDateTime <= data.endDateTime,
+      {
+        message: '終了日時は開始日時の後に設定してください',
+        path: ['endDateTime'],
+      }
+    ),
+
+  eventPhotos: z
+    .instanceof(File)
+    .nullable()
+    .refine((file) => {
+      return !file || file.size <= MAX_UPLOAD_SIZE;
+    }, 'ファイルサイズを30MB以内にしてください')
+    .refine((file) => {
+      return !file || ACCEPTED_FILE_TYPES.includes(file.type);
+    }, '画像ファイルのみアップロードできます')
+    .array(),
+  //.array()をつける事によって、中身が配列に　　↑↑ })
+});
+export type EventSchemaType = z.infer<typeof eventScheme>;
 
 type Props = {
   onClose: () => void;
   event: EventT;
   afterSaveEvent: () => void;
+  eventPhotos: EventPhotoT[];
 };
 
 export const EditEventDialogContent = ({
   onClose,
   event,
   afterSaveEvent,
+  eventPhotos,
 }: Props) => {
   const {
     //何を使うか
     control,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<EventSchemaType>({
     //<型>(中身：オブジェクトの形)
     resolver: zodResolver(eventScheme),
     mode: 'onSubmit',
     criteriaMode: 'all',
     defaultValues: {
-      title: event.title,
-      startDateTime: new Date(event.startDateTime),
-      endDateTime: event.endDateTime ? new Date(event.endDateTime) : null,
-      place: event.place,
-      url: event.url,
-      member: event.member,
-      memo: event.memo,
-      diary: event.diary,
-      //boolean型に戻した↓
-      success:
-        event.success === null
-          ? null
-          : (event.success.toString() as 'true' | 'false'),
+      event: {
+        title: event.title,
+        startDateTime: new Date(event.startDateTime),
+        endDateTime: event.endDateTime ? new Date(event.endDateTime) : null,
+        place: event.place,
+        url: event.url,
+        member: event.member,
+        memo: event.memo,
+        diary: event.diary,
+        //boolean型に戻した↓
+        success:
+          event.success === null
+            ? null
+            : (event.success.toString() as 'true' | 'false'),
+      },
+      eventPhotos: [null], //ファイルの初期値はnullにすること
     },
   });
+
   const { setSnackbarMessage, setIsSnackbarOpen } = useSnackbarContext();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const onEditEvent = (data: EventSchemaType) => {
-    const patchData: PatchEventRequestBody = {
-      title: data.title,
-      startDateTime: data.startDateTime.toISOString(),
-      endDateTime: data.endDateTime?.toISOString() || null,
-      place: data.place || null,
-      url: data.url || null,
-      member: data.member || null,
-      memo: data.memo || null,
-      diary: data.diary || null,
-      success:
-        data.success === null ? null : data.success === 'true' ? true : false,
-    };
+  const onEditEvent = async (data: EventSchemaType) => {
+    setIsLoading(true);
+    try {
+      let fileKey = null;
+      let filename = null;
+      if (data.eventPhotos.length > 0 && !!data.eventPhotos[0]) {
+        //signedURLの取得
+        const postData: PostEventPhotoGenerateSignedUrlsRequestBody = {
+          uploadLength: 1,
+        };
+        const res =
+          await axios.post<PostEventPhotoGenerateSignedUrlsResposeSuccessBody>(
+            '/api/generateSignedUrls',
+            postData
+          );
+        fileKey = res.data.uploads[0].fileKey;
+        //fileにnameをつけるとファイルの名前がとれる決まり
+        filename = data.eventPhotos[0].name;
 
-    axios
-      .patch<PatchEventResponseSuccessBody>(
+        //取得したURLを使ってＧＣＳにファイルをPUTする
+        await axios.put(res.data.uploads[0].signedGcsUrl, data.eventPhotos[0], {
+          headers: {
+            'Content-Type': 'application/octet-stream',
+          },
+        });
+      }
+
+      const patchData: PatchEventRequestBody = {
+        event: {
+          title: data.event.title,
+          startDateTime: data.event.startDateTime.toISOString(),
+          endDateTime: data.event.endDateTime?.toISOString() || null,
+          place: data.event.place || null,
+          url: data.event.url || null,
+          member: data.event.member || null,
+          memo: data.event.memo || null,
+          diary: data.event.diary || null,
+          success:
+            data.event.success === null
+              ? null
+              : data.event.success === 'true'
+              ? true
+              : false,
+        },
+        eventPhotos:
+          !!fileKey && !!filename
+            ? [
+                {
+                  fileKey: fileKey,
+                  originalFileName: filename,
+                },
+              ]
+            : [],
+      };
+
+      await axios.patch<PatchEventResponseSuccessBody>(
         `/api/events/${event.id}`,
         patchData
-      ) //patchする
-      .then(() => {
-        setSnackbarMessage({
-          severity: 'success',
-          text: 'イベント編集完了',
-        });
-        afterSaveEvent();
-        setIsSnackbarOpen(true);
-        onClose();
-      })
-      .catch((error) => {
-        setSnackbarMessage({
-          severity: 'error',
-          text: 'イベントの編集に失敗しました。',
-        });
-        setIsSnackbarOpen(true);
+      ); //patchする
+      setSnackbarMessage({
+        severity: 'success',
+        text: 'イベント編集完了',
       });
+      setIsLoading(false);
+      afterSaveEvent();
+      setIsSnackbarOpen(true);
+      onClose();
+    } catch (error) {
+      setSnackbarMessage({
+        severity: 'error',
+        text: 'イベントの編集に失敗しました。',
+      });
+      setIsLoading(false);
+      setIsSnackbarOpen(true);
+    }
   };
 
   return (
@@ -147,8 +216,9 @@ export const EditEventDialogContent = ({
       >
         <TextFieldRHF<EventSchemaType>
           control={control}
-          name="title"
+          name="event.title"
           label="イベントタイトル"
+          startIcon={<AccessTimeIcon />}
         />
         <Box
           sx={{
@@ -158,45 +228,58 @@ export const EditEventDialogContent = ({
           }}
         >
           <DatePickerRHF<EventSchemaType>
-            name="startDateTime"
+            name="event.startDateTime"
             control={control}
             label="開催日時"
           />
           <Box> ~ </Box>
           <DatePickerRHF<EventSchemaType>
-            name="endDateTime"
+            name="event.endDateTime"
             control={control}
             label="終了日時"
           />
         </Box>
         <TextFieldRHF<EventSchemaType>
           control={control}
-          name="place"
+          name="event.place"
           label="開催場所"
         />
         <TextFieldRHF<EventSchemaType>
           control={control}
-          name="url"
+          name="event.url"
           label="イベントページURL"
           // リンクつける
         />
         <TextFieldRHF<EventSchemaType>
           control={control}
-          name="member"
+          name="event.member"
           label="同行メンバー"
         />
         <TextFieldRHF<EventSchemaType>
           control={control}
-          name="memo"
+          name="event.memo"
           label="詳細memo"
         />
-
         <TextFieldRHF<EventSchemaType>
           control={control}
-          name="diary"
+          name="event.diary"
           label="イベントレポート"
         />
+        <Box sx={{ width: '100%' }}>
+          <Box sx={{ fontSize: 'small', padding: '6px' }}>イベントフォト</Box>
 
+          {[...Array(1)].map((_, i) => {
+            //mapでコンポーネントを返すとき、keyを必ず指定する
+            return (
+              <EventPhoto
+                key={i}
+                setValue={setValue}
+                index={i}
+                eventPhoto={eventPhotos[0]}
+              />
+            );
+          })}
+        </Box>
         <Box
           sx={{
             display: 'flex',
@@ -208,7 +291,7 @@ export const EditEventDialogContent = ({
           <FormLabel id="success">脱出 </FormLabel>
           <Controller
             control={control}
-            name="success"
+            name="event.success"
             render={({ field }) => (
               <RadioGroup
                 ref={field.ref}

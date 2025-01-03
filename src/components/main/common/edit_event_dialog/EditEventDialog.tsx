@@ -1,12 +1,14 @@
 import { Dialog } from '@mui/material';
 import { EditEventDialogContent } from './EditEventDialogContent';
 import { EventT } from '@/types/EventT';
+import { EventPhotoT } from '@/types/EventPhotoT';
 
 type Props = {
   event: EventT;
   isOpen: boolean;
   onClose: () => void;
   afterSaveEvent: () => void;
+  eventPhotos: EventPhotoT[];
 };
 
 export const EditEventDialog = ({
@@ -14,6 +16,7 @@ export const EditEventDialog = ({
   isOpen,
   onClose,
   afterSaveEvent,
+  eventPhotos,
 }: Props) => {
   return (
     <>
@@ -44,6 +47,7 @@ export const EditEventDialog = ({
           event={event}
           onClose={onClose}
           afterSaveEvent={afterSaveEvent}
+          eventPhotos={eventPhotos}
         />
       </Dialog>
     </>

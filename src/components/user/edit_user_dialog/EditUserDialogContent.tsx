@@ -18,14 +18,7 @@ import {
 import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from 'react';
 import { UserT } from '@/types/UserT';
 import ModeEditTwoToneIcon from '@mui/icons-material/ModeEditTwoTone';
-
-const MAX_UPLOAD_SIZE = 1024 * 1024 * 30; // 30MB
-const ACCEPTED_FILE_TYPES = [
-  'image/jpeg',
-  'image/png',
-  'image/bpm',
-  'image/webp',
-];
+import { ACCEPTED_FILE_TYPES, MAX_UPLOAD_SIZE } from '@/constants/imageSetting';
 
 const userProfileScheme = z.object({
   name: z.string(),
@@ -71,7 +64,6 @@ export const EditUserDialogContent = ({
     handleSubmit,
     formState: { errors },
     setValue,
-    watch,
   } = useForm<UserProfileSchemaType>({
     //<型>(中身：オブジェクトの形)
     resolver: zodResolver(userProfileScheme),
@@ -80,7 +72,7 @@ export const EditUserDialogContent = ({
     defaultValues: {
       //初期設定のやつとってくる
       name: user.name,
-      avatar: null,
+      avatar: null, //ファイルの初期値はnullにすること
       activityAreas: user.activityAreas,
       favoriteType: user.favoriteType,
       strongPoints: user.strongPoints,
@@ -91,6 +83,7 @@ export const EditUserDialogContent = ({
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(
     user.avatarUrl ?? undefined
   );
+  //↑nullはエラーになる為、nullの場合はundefindに変換
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const onChangeAvatar = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -183,7 +176,7 @@ export const EditUserDialogContent = ({
         gap: '16px',
         border: '1px double white',
         borderRadius: '20px',
-        padding: '16px',
+        padding: '24px',
         boxShadow: '3',
         alignItems: 'center',
       }}
@@ -196,7 +189,6 @@ export const EditUserDialogContent = ({
           flexDirection: 'column',
           alignItems: 'center',
           gap: '16px',
-          padding: '32px',
           width: '100%',
         }}
       >
@@ -206,9 +198,15 @@ export const EditUserDialogContent = ({
           label="名前"
         />
 
-        <Box>
+        <Box sx={{ width: '100%' }}>
           <Box sx={{ fontSize: 'small', padding: '6px' }}>プロフィール画像</Box>
-          {!!avatarUrl && <img src={avatarUrl} alt="avatarUrl" />}
+          {!!avatarUrl && (
+            <img
+              src={avatarUrl}
+              alt="avatarUrl"
+              style={{ objectFit: 'contain', width: '100%', height: '250px' }}
+            />
+          )}
           <input
             name="avatar"
             type="file"
@@ -220,14 +218,10 @@ export const EditUserDialogContent = ({
           {!!avatarUrl && (
             <Button
               onClick={avatarDelete}
-              variant="contained"
+              variant={'text'}
               sx={{
-                width: '100px',
-                marginTop: '16px',
+                // marginTop: '16px',
                 fontSize: 'small',
-                backgroundColor: 'gray',
-                color: 'white',
-                margin: '8px',
               }}
             >
               画像削除

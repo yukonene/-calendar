@@ -39,13 +39,14 @@ export default async function handler(
   //バリデーションチェック
   if (!token) {
     //tokenがfalseの場合status401を返す
-    res.status(401).json({ error: 'authentication faild' });
+    res.status(401).json({ error: '認証情報がありません' });
     return;
   }
   //トークンの検証をする
 
   try {
-    const decodedToken = await auth.verifyIdToken(token); //トークンの検証に成功したらデータの復号化したデータを返す
+    const decodedToken = await auth.verifyIdToken(token);
+    //トークンの検証に成功したらデータの復号化したデータを返す
     const uid = decodedToken.uid; //復号化したデータの中のuidを取り出す
     const isEmailVerified = decodedToken.email_verified;
     const user = await prisma.user.findUnique({

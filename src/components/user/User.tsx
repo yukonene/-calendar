@@ -5,6 +5,7 @@ import axios from 'axios';
 import { GetUserResponseSuccessBody } from '@/pages/api/user';
 import { useFirebaseUserContext } from '../common/FirebaseUserProvider';
 import { UserT } from '@/types/UserT';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 export const User = () => {
   const [editUserDialogOpen, SetEditUserDialogOpen] = useState(false);
@@ -101,10 +102,13 @@ export const User = () => {
 
           {/* プロフィール画像 */}
           {!!user.avatarUrl && (
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-              <Box>{user.avatarUrl}</Box>
-            </Box>
+            <img
+              src={user.avatarUrl}
+              alt="avatar"
+              style={{ objectFit: 'contain', width: '100%', height: '250px' }}
+            />
           )}
+
           {!!user.activityAreas && (
             <Box
               sx={{
