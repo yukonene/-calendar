@@ -3,11 +3,11 @@ import { Box, Button, CircularProgress, Link } from '@mui/material';
 import axios from 'axios';
 import { format } from 'date-fns';
 import { useCallback, useEffect, useState } from 'react';
-import { EditEventDialog } from '../common/edit_event_dialog/EditEventDialog';
-import { useEventsContext } from '../common/EventsProvider';
+import { EditEventDialog } from '../components/edit_event_dialog/EditEventDialog';
+import { useEventsContext } from '../components/EventsProvider';
 import { EventT } from '@/types/EventT';
 import ModeEditTwoToneIcon from '@mui/icons-material/ModeEditTwoTone';
-import { DeleteEventDialog } from '../common/delete_event_dialog/DeleteEventDialog';
+import { DeleteEventDialog } from '../components/delete_event_dialog/DeleteEventDialog';
 import { EventPhotoT } from '@/types/EventPhotoT';
 
 type Props = {

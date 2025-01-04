@@ -1,5 +1,5 @@
 import { EventT } from '@/types/EventT';
-import { useSnackbarContext } from '@/components/common/SnackbarProvider';
+import { useSnackbarContext } from '@/providers/SnackbarProvider';
 import { Box, DialogTitle, DialogActions, Button } from '@mui/material';
 import { useCallback } from 'react';
 import { DeleteEventResponseSuccessBody } from '@/pages/api/events/[id]';

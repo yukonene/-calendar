@@ -3,7 +3,7 @@ import { EditUserDialog } from './edit_user_dialog/EditUserDialog';
 import { Avatar, Box, Button, CircularProgress } from '@mui/material';
 import axios from 'axios';
 import { GetUserResponseSuccessBody } from '@/pages/api/user';
-import { useFirebaseUserContext } from '../common/FirebaseUserProvider';
+import { useFirebaseUserContext } from '../../providers/FirebaseUserProvider';
 import { UserT } from '@/types/UserT';
 
 export const User = () => {

@@ -12,7 +12,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useFirebaseUserContext } from '../../common/FirebaseUserProvider';
+import { useFirebaseUserContext } from '../../../providers/FirebaseUserProvider';
 import { EventT } from '@/types/EventT';
 import { addMonths, endOfMonth, startOfMonth } from 'date-fns';
 import { EventPhotoT } from '@/types/EventPhotoT';

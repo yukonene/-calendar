@@ -1,5 +1,5 @@
 import { ReactNode, useCallback, useEffect, useState } from 'react';
-import { useFirebaseUserContext } from './FirebaseUserProvider';
+import { useFirebaseUserContext } from '../../providers/FirebaseUserProvider';
 import { UserT } from '@/types/UserT';
 import { auth } from '@/lib/firebase/firebaseClient';
 import { useRouter } from 'next/router';

@@ -13,17 +13,6 @@ export type GetEventResponseSuccessBody = {
   eventPhotos: EventPhotoT[];
 };
 
-export type PostEventPhotoGenerateSignedUrlsRequestBody = {
-  uploadLength: number;
-};
-
-export type PostEventPhotoGenerateSignedUrlsResposeSuccessBody = {
-  uploads: {
-    signedGcsUrl: string;
-    fileKey: string;
-  }[];
-};
-
 export type PatchEventRequestBody = {
   event: {
     title: string;

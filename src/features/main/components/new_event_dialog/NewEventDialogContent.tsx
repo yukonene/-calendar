@@ -10,9 +10,9 @@ import {
   PostEventResponseSuccessBody,
 } from '@/pages/api/events';
 import { format } from 'date-fns';
-import { TextFieldRHF } from '../../../common/TextFieldRHF';
-import { DatePickerRHF } from '../../../common/DatePickerRHF';
-import { useSnackbarContext } from '../../../common/SnackbarProvider';
+import { TextFieldRHF } from '../../../../components/forms/TextFieldRHF';
+import { DatePickerRHF } from '../../../../components/forms/DatePickerRHF';
+import { useSnackbarContext } from '../../../../providers/SnackbarProvider';
 
 const eventScheme = z
   .object({

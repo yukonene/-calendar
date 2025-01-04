@@ -4,7 +4,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import allLocales from '@fullcalendar/core/locales-all';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import { Box } from '@mui/material';
-import { useEventsContext } from '../common/EventsProvider';
+import { useEventsContext } from '../components/EventsProvider';
 import { MobileDateEventsDialog } from './MobileDateEventsDialog';
 import { EventT } from '@/types/EventT';
 import { isSameDay } from 'date-fns';

@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
-import { TextFieldRHF } from '../../common/TextFieldRHF';
+import { TextFieldRHF } from '../../../components/forms/TextFieldRHF';
 import { Avatar, Button, Link } from '@mui/material';
 import {
   PatchUserRequestBody,
@@ -20,6 +20,8 @@ import { UserT } from '@/types/UserT';
 import ModeEditTwoToneIcon from '@mui/icons-material/ModeEditTwoTone';
 import { ACCEPTED_FILE_TYPES, MAX_UPLOAD_SIZE } from '@/constants/imageSetting';
 import src from '@emotion/styled';
+import { postGenerateSignedUrls } from '@/apis/postGenerateSignedUrls';
+import { patchUser } from '@/apis/patchUser';
 
 const userProfileScheme = z.object({
   name: z.string(),
@@ -118,13 +120,10 @@ export const EditUserDialogContent = ({
       let filename = null;
       if (!!data.avatar) {
         //signedURLの取得
-        const postData: PostGenerateSignedUrlsRequestBody = {
+        const postData = {
           uploadLength: 1,
         };
-        const res = await axios.post<PostGenerateSignedUrlsResposeSuccessBody>(
-          '/api/generateSignedUrls',
-          postData
-        );
+        const res = await postGenerateSignedUrls(postData);
         fileKey = res.data.uploads[0].fileKey;
         //fileにnameをつけるとファイルの名前がとれる決まり
         filename = data.avatar.name;
@@ -138,7 +137,7 @@ export const EditUserDialogContent = ({
       }
 
       //全てのデータの更新
-      const patchData: PatchUserRequestBody = {
+      const patchData = {
         name: data.name,
         avatarFileKey: fileKey,
         avatarOriginalFileName: filename,
@@ -148,7 +147,7 @@ export const EditUserDialogContent = ({
         favoriteGroup: data.favoriteGroup,
       };
 
-      await axios.patch<PatchUserResponseSuccessBody>('/api/user', patchData); //patchする
+      await patchUser(patchData); //patchする
 
       setSnackbarMessage({
         severity: 'success',

@@ -3,8 +3,8 @@ import { Box, Button } from '@mui/material';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { TextFieldRHF } from '../common/TextFieldRHF';
-import { useSnackbarContext } from '../common/SnackbarProvider';
+import { TextFieldRHF } from '../../components/forms/TextFieldRHF';
+import { useSnackbarContext } from '../../providers/SnackbarProvider';
 
 const changePasswordFormSchema = z.object({
   email: z

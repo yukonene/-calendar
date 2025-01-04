@@ -11,14 +11,14 @@ import {
   Typography,
 } from '@mui/material';
 import { format } from 'date-fns';
-import { EditEventDialog } from '../common/edit_event_dialog/EditEventDialog';
+import { EditEventDialog } from '../components/edit_event_dialog/EditEventDialog';
 import { EventT } from '@/types/EventT';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ModeEditTwoToneIcon from '@mui/icons-material/ModeEditTwoTone';
 import { useCallback, useState } from 'react';
-import { useEventsContext } from '../common/EventsProvider';
-import { DeleteEventDialog } from '../common/delete_event_dialog/DeleteEventDialog';
-import { NewEventDialog } from '@/components/main/common/new_event_dialog/NewEventDialog';
+import { useEventsContext } from '../components/EventsProvider';
+import { DeleteEventDialog } from '../components/delete_event_dialog/DeleteEventDialog';
+import { NewEventDialog } from '@/features/main/components/new_event_dialog/NewEventDialog';
 import AddIcon from '@mui/icons-material/Add';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { EventPhotoT } from '@/types/EventPhotoT';

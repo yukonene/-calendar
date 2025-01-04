@@ -1,4 +1,4 @@
-import { useResponsiveContext } from '../common/ResponsiveProvider';
+import { useResponsiveContext } from '../../providers/ResponsiveProvider';
 import { DesktopMain } from './desktop_main/DesktopMain';
 import { MobileMain } from './mobile_main/MobileMain';
 

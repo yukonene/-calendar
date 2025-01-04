@@ -1,4 +1,4 @@
-import { User } from '@/components/user/User';
+import { User } from '@/features/user/User';
 import { cookieOptions } from '@/constants/cookieOptions';
 import { auth } from '@/lib/firebase/firebaseAdminClient';
 import prisma from '@/lib/prisma';

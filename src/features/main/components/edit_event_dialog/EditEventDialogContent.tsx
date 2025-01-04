@@ -12,22 +12,22 @@ import { Controller, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import { ACCEPTED_FILE_TYPES, MAX_UPLOAD_SIZE } from '@/constants/imageSetting';
-import { TextFieldRHF } from '../../../common/TextFieldRHF';
-import { DatePickerRHF } from '../../../common/DatePickerRHF';
+import { TextFieldRHF } from '../../../../components/forms/TextFieldRHF';
+import { DatePickerRHF } from '../../../../components/forms/DatePickerRHF';
 import {
   PatchEventRequestBody,
   PatchEventResponseSuccessBody,
-  PostEventPhotoGenerateSignedUrlsRequestBody,
-  PostEventPhotoGenerateSignedUrlsResposeSuccessBody,
 } from '@/pages/api/events/[id]';
 import { EventT } from '@/types/EventT';
-import { useSnackbarContext } from '@/components/common/SnackbarProvider';
+import { useSnackbarContext } from '@/providers/SnackbarProvider';
 import { EventPhoto } from './EventPhoto';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { EventPhotoT } from '@/types/EventPhotoT';
 import { useRef, useState } from 'react';
 
 import { PostGenerateSignedUrlsResposeSuccessBody } from '@/pages/api/generateSignedUrls';
+import { postGenerateSignedUrls } from '@/apis/postGenerateSignedUrls';
+import { patchEvent } from '@/apis/pachEvent';
 
 const eventScheme = z.object({
   event: z
@@ -127,14 +127,10 @@ export const EditEventDialogContent = ({
       let filename = null;
       if (data.eventPhotos.length > 0 && !!data.eventPhotos[0]) {
         //signedURLの取得
-        const postData: PostEventPhotoGenerateSignedUrlsRequestBody = {
+        const postData = {
           uploadLength: 1,
         };
-        const res =
-          await axios.post<PostEventPhotoGenerateSignedUrlsResposeSuccessBody>(
-            '/api/generateSignedUrls',
-            postData
-          );
+        const res = await postGenerateSignedUrls(postData);
         fileKey = res.data.uploads[0].fileKey;
         //fileにnameをつけるとファイルの名前がとれる決まり
         filename = data.eventPhotos[0].name;
@@ -175,10 +171,7 @@ export const EditEventDialogContent = ({
             : [],
       };
 
-      await axios.patch<PatchEventResponseSuccessBody>(
-        `/api/events/${eventInfo.event.id}`,
-        patchData
-      ); //patchする
+      await patchEvent({ eventId: eventInfo.event.id, patchData: patchData }); //patchする
       setSnackbarMessage({
         severity: 'success',
         text: 'イベント編集完了',

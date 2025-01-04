@@ -1,7 +1,7 @@
-import { FirebaseUserProvider } from '@/components/common/FirebaseUserProvider';
-import Layout from '@/components/common/Layout';
-import { ResponsiveProvider } from '@/components/common/ResponsiveProvider';
-import { SnackbarProvider } from '@/components/common/SnackbarProvider';
+import { FirebaseUserProvider } from '@/providers/FirebaseUserProvider';
+import Layout from '@/components/layouts/Layout';
+import { ResponsiveProvider } from '@/providers/ResponsiveProvider';
+import { SnackbarProvider } from '@/providers/SnackbarProvider';
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
 

@@ -11,9 +11,9 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import allLocales from '@fullcalendar/core/locales-all';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import { Box } from '@mui/material';
-import { NewEventDialog } from '../common/new_event_dialog/NewEventDialog';
+import { NewEventDialog } from '../components/new_event_dialog/NewEventDialog';
 import { EventClickArg } from '@fullcalendar/core/index.js';
-import { useEventsContext } from '../common/EventsProvider';
+import { useEventsContext } from '../components/EventsProvider';
 import { addMonths, startOfMonth } from 'date-fns';
 
 type Props = {
