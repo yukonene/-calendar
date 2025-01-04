@@ -10,16 +10,18 @@ steps:
       - '-f'
       - Dockerfile
     id: Build
-    secretEnv: ["NEXT_PUBLIC_APIKEY"]
-    secretEnv: ["NEXT_PUBLIC_AUTHDOMAIN"]
-    secretEnv: ["NEXT_PUBLIC_PROJECTID"]
-    secretEnv: ["NEXT_PUBLIC_STORAGEBUCKET"]
-    secretEnv: ["NEXT_PUBLIC_MESSAGINGSENDERID"]
-    secretEnv: ["NEXT_PUBLIC_APPID"]
-    secretEnv: ["DATABASE_URL"]
-    secretEnv: ["GCP_SERVICE_ACCOUNT_PROJECT_ID"]
-    secretEnv: ["GCP_SERVICE_ACCOUNT_PRIVATE_KEY"]
-    secretEnv: ["GCP_SERVICE_ACCOUNT_CLIENT_EMAIL"]
+    secretEnv: [
+      'NEXT_PUBLIC_APIKEY'
+     'NEXT_PUBLIC_AUTHDOMAIN',
+     'NEXT_PUBLIC_PROJECTID',
+     'NEXT_PUBLIC_STORAGEBUCKET',
+     'NEXT_PUBLIC_MESSAGINGSENDERID',
+     'NEXT_PUBLIC_APPID',
+     'DATABASE_URL',
+     'GCP_SERVICE_ACCOUNT_PROJECT_ID',
+     'GCP_SERVICE_ACCOUNT_PRIVATE_KEY',
+     'GCP_SERVICE_ACCOUNT_CLIENT_EMAIL'
+    ]
   - name: gcr.io/cloud-builders/docker
     args:
       - push
