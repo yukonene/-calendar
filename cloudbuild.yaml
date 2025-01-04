@@ -18,12 +18,8 @@ steps:
     secretEnv: ["NEXT_PUBLIC_APPID"]
     secretEnv: ["DATABASE_URL"]
     secretEnv: ["GCP_SERVICE_ACCOUNT_PROJECT_ID"]
-    secretEnv: ["NEXT_PUBLIC_APIKEY"]
+    secretEnv: ["GCP_SERVICE_ACCOUNT_PRIVATE_KEY"]
     secretEnv: ["GCP_SERVICE_ACCOUNT_CLIENT_EMAIL"]
-
-
-
-    
   - name: gcr.io/cloud-builders/docker
     args:
       - push
