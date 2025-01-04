@@ -4,7 +4,7 @@ steps:
     args:
       - '-c'
       - |
-        gcloud secrets versions access latest --secret={secret-manager-name} > .env.production.local
+        gcloud secrets versions access latest --secret=ENV_FILE > .env.production.local
     id: 'fetch-secret'
   - name: gcr.io/cloud-builders/docker
     args:
