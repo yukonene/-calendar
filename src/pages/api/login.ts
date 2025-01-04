@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '@/lib/prisma';
 import { auth } from '@/lib/firebase/firebaseAdminClient';
 
-export type GetUserResponseSuccessBody = '';
+export type GetLoginUserResponseSuccessBody = '';
 
 export default async function handler(
   req: NextApiRequest,

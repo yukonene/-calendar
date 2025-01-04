@@ -9,7 +9,12 @@ import { bucket } from '@/lib/cloudStorage';
 import { z } from 'zod';
 import { UserT } from '@/types/UserT';
 
-export type PostUserRequestBody = '';
+export type PostUserRequestBody = {
+  email: string;
+  password: string;
+  passwordConfirmation: string;
+};
+export type PostUserResponseSuccessBody = '';
 
 export type GetUserResponseSuccessBody = {
   user: UserT;

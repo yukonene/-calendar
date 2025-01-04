@@ -9,6 +9,7 @@ import { EventT } from '@/types/EventT';
 import ModeEditTwoToneIcon from '@mui/icons-material/ModeEditTwoTone';
 import { DeleteEventDialog } from '../components/delete_event_dialog/DeleteEventDialog';
 import { EventPhotoT } from '@/types/EventPhotoT';
+import { getEvent } from '@/apis/events/getEvent';
 
 type Props = {
   eventId: number | undefined;
@@ -27,8 +28,7 @@ export const DesktopEvent = ({ eventId }: Props) => {
     if (!eventId) {
       return;
     } else {
-      axios
-        .get<GetEventResponseSuccessBody>(`/api/events/${eventId}`)
+      getEvent(eventId)
         .then((res) => {
           setEventInfo(res.data); //GetEventsResponseSuccessBody=res.data
         })

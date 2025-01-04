@@ -1,7 +1,6 @@
 import { cookieOptions } from '@/constants/cookieOptions';
 import { Button, Snackbar } from '@mui/material';
 import Box from '@mui/material/Box';
-import axios from 'axios';
 import { setCookie } from 'cookies-next';
 import { FirebaseError } from 'firebase/app';
 import { signInWithEmailAndPassword } from 'firebase/auth';
@@ -14,6 +13,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TextFieldRHF } from '../../components/forms/TextFieldRHF';
 import { useFirebaseUserContext } from '../../providers/FirebaseUserProvider';
+import { getLogin } from '@/apis/auth/getLogin';
 
 const loginFormSchema = z //zod
   .object({
@@ -62,8 +62,7 @@ export const Login = () => {
           .getIdToken() //トークン取得
           .then((token) => {
             setCookie('token', token, cookieOptions); //'key', value, options
-            axios
-              .get('/api/login')
+            getLogin()
               .then(() => {
                 setFirebaseUser(user); //ログインの状態を保持
                 router.push('/');

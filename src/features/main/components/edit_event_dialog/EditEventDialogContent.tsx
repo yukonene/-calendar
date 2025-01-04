@@ -27,7 +27,7 @@ import { useRef, useState } from 'react';
 
 import { PostGenerateSignedUrlsResposeSuccessBody } from '@/pages/api/generateSignedUrls';
 import { postGenerateSignedUrls } from '@/apis/postGenerateSignedUrls';
-import { patchEvent } from '@/apis/pachEvent';
+import { patchEvent } from '@/apis/events/pachEvent';
 
 const eventScheme = z.object({
   event: z

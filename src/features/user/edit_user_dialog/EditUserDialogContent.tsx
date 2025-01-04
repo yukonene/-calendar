@@ -6,22 +6,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import { TextFieldRHF } from '../../../components/forms/TextFieldRHF';
 import { Avatar, Button, Link } from '@mui/material';
-import {
-  PatchUserRequestBody,
-  PatchUserResponseSuccessBody,
-} from '@/pages/api/user';
 import { LoadingButton } from '@mui/lab';
-import {
-  PostGenerateSignedUrlsRequestBody,
-  PostGenerateSignedUrlsResposeSuccessBody,
-} from '@/pages/api/generateSignedUrls';
 import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from 'react';
 import { UserT } from '@/types/UserT';
 import ModeEditTwoToneIcon from '@mui/icons-material/ModeEditTwoTone';
 import { ACCEPTED_FILE_TYPES, MAX_UPLOAD_SIZE } from '@/constants/imageSetting';
-import src from '@emotion/styled';
 import { postGenerateSignedUrls } from '@/apis/postGenerateSignedUrls';
-import { patchUser } from '@/apis/patchUser';
+import { patchUser } from '@/apis/users/patchUser';
 
 const userProfileScheme = z.object({
   name: z.string(),

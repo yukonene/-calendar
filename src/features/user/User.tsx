@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { EditUserDialog } from './edit_user_dialog/EditUserDialog';
 import { Avatar, Box, Button, CircularProgress } from '@mui/material';
-import axios from 'axios';
-import { GetUserResponseSuccessBody } from '@/pages/api/user';
 import { useFirebaseUserContext } from '../../providers/FirebaseUserProvider';
 import { UserT } from '@/types/UserT';
+import { auth } from '@/lib/firebase/firebaseClient';
+import router from 'next/router';
+import { getUser } from '@/apis/users/getUser';
 
 export const User = () => {
   const [editUserDialogOpen, SetEditUserDialogOpen] = useState(false);
@@ -15,12 +16,11 @@ export const User = () => {
     SetEditUserDialogOpen(true);
   }, []);
 
-  const { firebaseUser } = useFirebaseUserContext();
+  const { firebaseUser, setFirebaseUser } = useFirebaseUserContext();
   const [user, setUser] = useState<UserT>();
   const getProfile = useCallback(() => {
     //基本的にはusecallbackつける
-    axios
-      .get<GetUserResponseSuccessBody>('/api/user/')
+    getUser()
       .then((res) => {
         setUser(res.data.user);
       })
@@ -45,6 +45,12 @@ export const User = () => {
       </Box>
     );
   }
+  const logout = () => {
+    auth.signOut();
+    setFirebaseUser(null);
+    router.push('/login');
+  };
+
   //↓ここではuserはundifindの値をとらない
   return (
     <Box
@@ -224,6 +230,14 @@ export const User = () => {
         >
           編集
         </Button>
+        <Box sx={{ display: 'flex' }}>
+          <Button
+            onClick={logout}
+            sx={{ marginLeft: 'auto', fontSize: 'small' }}
+          >
+            ログアウト
+          </Button>
+        </Box>
       </Box>
     </Box>
   );

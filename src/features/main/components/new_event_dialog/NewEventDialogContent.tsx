@@ -13,6 +13,7 @@ import { format } from 'date-fns';
 import { TextFieldRHF } from '../../../../components/forms/TextFieldRHF';
 import { DatePickerRHF } from '../../../../components/forms/DatePickerRHF';
 import { useSnackbarContext } from '../../../../providers/SnackbarProvider';
+import { postEvent } from '@/apis/events/postEvent';
 
 const eventScheme = z
   .object({
@@ -71,7 +72,7 @@ export const NewEventDialogContent = ({
   const { setSnackbarMessage, setIsSnackbarOpen } = useSnackbarContext();
 
   const onCreateNewEvent = (data: EventSchemaType) => {
-    const postData: PostEventRequestBody = {
+    const postData = {
       title: data.title,
       startDateTime: data.startDateTime.toISOString(),
       endDateTime: data.endDateTime?.toISOString() || null,
@@ -81,8 +82,7 @@ export const NewEventDialogContent = ({
       memo: data.memo || null,
     };
 
-    axios
-      .post<PostEventResponseSuccessBody>('/api/events', postData) //POSTする
+    postEvent(postData) //POSTする
       .then(() => {
         setSnackbarMessage({
           severity: 'success',

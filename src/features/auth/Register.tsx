@@ -3,11 +3,9 @@ import {
   sendEmailVerification,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase/firebaseClient';
-import { useState } from 'react';
 import { cookieOptions } from '@/constants/cookieOptions';
 import { setCookie } from 'cookies-next';
-import axios from 'axios';
-import { Alert, Box, Button, Snackbar } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { FirebaseError } from 'firebase/app';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
@@ -15,6 +13,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { TextFieldRHF } from '../../components/forms/TextFieldRHF';
 import { useSnackbarContext } from '../../providers/SnackbarProvider';
+import { postUser } from '@/apis/users/postUser';
 
 const registerFormSchema = z
   .object({
@@ -102,8 +101,7 @@ export const Register = () => {
           .getIdToken() //トークン取得
           .then((token) => {
             setCookie('token', token, cookieOptions); //'key', value, options
-            axios
-              .post('/api/user', postData)
+            postUser(postData)
               .then(() => {
                 sendEmailVerification(user)
                   .then(() => {

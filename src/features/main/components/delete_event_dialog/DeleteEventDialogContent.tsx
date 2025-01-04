@@ -5,6 +5,7 @@ import { useCallback } from 'react';
 import { DeleteEventResponseSuccessBody } from '@/pages/api/events/[id]';
 import axios from 'axios';
 import { EventPhotoT } from '@/types/EventPhotoT';
+import { deleteEvent } from '@/apis/events/deleteEvent';
 
 type Props = {
   onClose: () => void;
@@ -22,11 +23,8 @@ export const DeleteEventDialogContent = ({
 }: Props) => {
   const { setSnackbarMessage, setIsSnackbarOpen } = useSnackbarContext();
 
-  const deleteEvent = useCallback(() => {
-    axios
-      .delete<DeleteEventResponseSuccessBody>(
-        `/api/events/${eventInfo.event.id}`
-      ) //deleteする
+  const handleDeleteEvent = useCallback(() => {
+    deleteEvent(eventInfo.event.id) //deleteする
       .then(() => {
         setSnackbarMessage({
           severity: 'success',
@@ -59,7 +57,7 @@ export const DeleteEventDialogContent = ({
 
       <DialogActions>
         <Button onClick={onClose}>いいえ</Button>
-        <Button onClick={deleteEvent} autoFocus>
+        <Button onClick={handleDeleteEvent} autoFocus>
           はい
         </Button>
       </DialogActions>

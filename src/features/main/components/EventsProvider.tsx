@@ -1,5 +1,3 @@
-import { GetEventsResponseSuccessBody } from '@/pages/api/events';
-import axios from 'axios';
 import {
   createContext,
   Dispatch,
@@ -17,6 +15,7 @@ import { EventT } from '@/types/EventT';
 import { addMonths, endOfMonth, startOfMonth } from 'date-fns';
 import { EventPhotoT } from '@/types/EventPhotoT';
 import FullCalendar from '@fullcalendar/react';
+import { getEvents } from '@/apis/events/getEvents';
 
 const EventsContext = createContext(
   {} as {
@@ -66,20 +65,12 @@ export const EventsProvider = ({ children }: Props) => {
   const getEventInfoList = useCallback(
     //基本的にはusecallbackつける
     () => {
-      // クエリを設定する為にURLSearchParamsを使う
-      const params = new URLSearchParams();
-
-      // startOfMonthDateのある月の1日をスタートとする
-      params.set('startDateTime', startOfMonthDate.toISOString());
       // startOfMonthDateのある月の末尾を最後とする
       const endDateTime = endOfMonth(startOfMonthDate);
-      params.set('endDateTime', endDateTime.toISOString());
-
-      axios
-        // params.toString()を行うと、もしparamsに何も設定されていない場合は""が返る
-        // 設定されていた場合は、key=valueの形で返ってくる
-        //  例： http://localhost:3000/api/events?startDateTime=2024-12-31T15%3A00%3A00.000Z&endDateTime=2025-01-31T14%3A59%3A59.999Z
-        .get<GetEventsResponseSuccessBody>(`/api/events?${params.toString()}`)
+      getEvents({
+        startDateTime: startOfMonthDate,
+        endDateTime: endDateTime,
+      })
         .then((res) => {
           setEventInfoList(res.data.eventInfoList); //GetEventsResponseSuccessBody=res.data
         })
