@@ -10,18 +10,19 @@ steps:
       - '-f'
       - Dockerfile
     id: Build
-    secretEnv: [
-      'NEXT_PUBLIC_APIKEY'
-     'NEXT_PUBLIC_AUTHDOMAIN',
-     'NEXT_PUBLIC_PROJECTID',
-     'NEXT_PUBLIC_STORAGEBUCKET',
-     'NEXT_PUBLIC_MESSAGINGSENDERID',
-     'NEXT_PUBLIC_APPID',
-     'DATABASE_URL',
-     'GCP_SERVICE_ACCOUNT_PROJECT_ID',
-     'GCP_SERVICE_ACCOUNT_PRIVATE_KEY',
-     'GCP_SERVICE_ACCOUNT_CLIENT_EMAIL'
-    ]
+    secretEnv:
+      [
+        'NEXT_PUBLIC_APIKEY',
+        'NEXT_PUBLIC_AUTHDOMAIN',
+        'NEXT_PUBLIC_PROJECTID',
+        'NEXT_PUBLIC_STORAGEBUCKET',
+        'NEXT_PUBLIC_MESSAGINGSENDERID',
+        'NEXT_PUBLIC_APPID',
+        'DATABASE_URL',
+        'GCP_SERVICE_ACCOUNT_PROJECT_ID',
+        'GCP_SERVICE_ACCOUNT_PRIVATE_KEY',
+        'GCP_SERVICE_ACCOUNT_CLIENT_EMAIL',
+      ]
   - name: gcr.io/cloud-builders/docker
     args:
       - push
@@ -78,7 +79,6 @@ availableSecrets:
     - versionName: projects/$PROJECT_ID/secrets/GCP_SERVICE_ACCOUNT_PROJECT_ID/versions/latest
       env: 'GCP_SERVICE_ACCOUNT_PROJECT_ID'
     - versionName: projects/$PROJECT_ID/secrets/GCP_SERVICE_ACCOUNT_PRIVATE_KEY/versions/latest
-      env: 'GCP_SERVICE_ACCOUNT_PRIVATE_KEY' 
+      env: 'GCP_SERVICE_ACCOUNT_PRIVATE_KEY'
     - versionName: projects/$PROJECT_ID/secrets/GCP_SERVICE_ACCOUNT_CLIENT_EMAIL/versions/latest
       env: 'GCP_SERVICE_ACCOUNT_CLIENT_EMAIL'
-
