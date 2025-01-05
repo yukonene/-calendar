@@ -1,6 +1,6 @@
 [
   {
-    "origin": ["http://localhost:3000"],
+    "origin": ["https://nenecalendar-180357311203.asia-northeast1.run.app"],
     "method": ["GET", "PUT"],
     "responseHeader": ["Content-Type"],
     "maxAgeSeconds": 300
