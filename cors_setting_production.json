@@ -1,6 +1,9 @@
 [
   {
-    "origin": ["https://nenecalendar-180357311203.asia-northeast1.run.app"],
+    "origin": [
+      "https://nenecalendar-180357311203.asia-northeast1.run.app",
+      "https://nenecalendar.com"
+    ],
     "method": ["GET", "PUT"],
     "responseHeader": ["Content-Type"],
     "maxAgeSeconds": 300

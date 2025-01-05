@@ -55,11 +55,18 @@ github と連携して使う
 -----環境変数の設定---------------------------------------------
 cloudbuild.yaml の作成>>>[Dockerfile]の作成>>>cloudbuild が Dockerfile を元に Image を作成>>>container(cloudrun)が完成
 ※※※※※cloudbuild.yaml は seacletManager から環境変数を受け取って、その値を Dockerfile に注入する設定を記載できる。※※※※※※
-シークレットマネジャーで.env.prodaction.local から全ての項目の登録をする。
+シークレットマネジャーで.env.prodaction.local から全ての項目の登録をする。加えて、シークレットマネジャーで ENV_FILE の項目に.env.production.local のファイル自体ををアップロードする
 cloudRun のサービスアカウントのメールアドレスを memo する。例：00000-compute@developer.gserviceaccount.com
-各サービスアカウントの権限で、新しいプリンシバルに上記メールアドレスを指定して、secletManager の seaclet アクセサーのロールを付与する
-cloudbuild.yaml のビルドフェーズで環境変数を「Dockerfile」に注入する。（3 か所
-Dockerfile は注入された環境変数を ARG で受け取って、ENV で環境変数として設定する。（3 か所
-上記を行ったうえで、cloudrun でシークレットマネージャーに入れた変数をすべて設定する
+シークレットマネジャーの各環境変数の権限タブで、新しいプリンシバルに上記メールアドレスを指定して、「SecletManager の secret アクセサー」のロールを付与する
+cloudbuild.yaml で、新たに fetch-secret ステップを追加する。また build ステップで'--build-arg'と'ENV_FILE=.env.production.local'を追記する
+上記を行ったうえで、cloudrun でシークレットマネージャーに入れた変数をすべて設定する（ENV_FILE は除く）
 -----データベースの初期設定------------------------------------------
-start.sh 内に npm run prisma migrate deploy を記載する事で実行できる
+start.sh 内に npm prisma migrate deploy を記載する事で実行できる
+-----google cloud strage で CORS の設定を行う------------------------------------------
+gsutil cors set cors_setting_production.json gs://nenecalendar-bucket
+gsutil cors get gs://nenecalendar-bucket
+-----カスタムドメインの設定------------------------------------------
+事前に Cloud Domains で、ドメインを購入しておく。
+そのうえで、下の手順でマッピング
+https://cloud.google.com/run/docs/mapping-custom-domains?hl=ja#map
+設定後数分～１日まつとマッピングされる
