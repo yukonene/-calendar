@@ -8,10 +8,11 @@ export const DesktopMain = () => {
 
   return (
     <Box
-      style={{
+      sx={{
         display: 'flex',
         flexDirection: 'row',
         height: '100%',
+        OverflowY: 'hiddon',
       }}
     >
       {/* カレンダー */}

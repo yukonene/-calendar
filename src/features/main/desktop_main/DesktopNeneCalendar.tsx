@@ -3,7 +3,6 @@ import {
   SetStateAction,
   useCallback,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 import FullCalendar from '@fullcalendar/react';
@@ -14,7 +13,6 @@ import { Box } from '@mui/material';
 import { NewEventDialog } from '../components/new_event_dialog/NewEventDialog';
 import { EventClickArg } from '@fullcalendar/core/index.js';
 import { useEventsContext } from '../components/EventsProvider';
-import { addMonths, startOfMonth } from 'date-fns';
 
 type Props = {
   setEventId: Dispatch<SetStateAction<number | undefined>>;
@@ -64,38 +62,43 @@ export const DesktopNeneCalendar = ({ setEventId }: Props) => {
 
   return (
     <Box sx={{ height: '100%' }}>
-      <FullCalendar
-        plugins={[dayGridPlugin, interactionPlugin]}
-        initialView="dayGridMonth"
-        locales={allLocales}
-        locale="ja" // 日本語設定
-        editable={true} // 編集可
-        contentHeight={500}
-        eventTimeFormat={{
-          hour: 'numeric',
-          minute: '2-digit',
-          meridiem: false,
-        }}
-        events={eventList}
-        dateClick={handleDateClick}
-        eventClick={handleEventClick}
-        ref={calendarRef}
-        customButtons={{
-          prevWithOnClick: {
-            text: '<',
-            click: handlePrevButton,
-          },
-          nextWithOnClick: {
-            text: '>',
-            click: handleNextButton,
-          },
-        }}
-        headerToolbar={{
-          left: 'title',
-          center: '',
-          right: 'prevWithOnClick,nextWithOnClick',
-        }}
-      />
+      <Box sx={{ OverflowY: 'hiddon', height: '100%' }}>
+        <FullCalendar
+          plugins={[dayGridPlugin, interactionPlugin]}
+          initialView="dayGridMonth"
+          locales={allLocales}
+          locale="ja" // 日本語設定
+          editable={true} // 編集可
+          contentHeight={'auto'}
+          eventTimeFormat={{
+            hour: 'numeric',
+            minute: '2-digit',
+            meridiem: false,
+          }}
+          events={eventList}
+          dateClick={handleDateClick}
+          eventClick={handleEventClick}
+          ref={calendarRef}
+          customButtons={{
+            prevWithOnClick: {
+              text: '<',
+              click: handlePrevButton,
+            },
+            nextWithOnClick: {
+              text: '>',
+              click: handleNextButton,
+            },
+          }}
+          headerToolbar={{
+            left: 'title',
+            center: '',
+            right: 'prevWithOnClick,nextWithOnClick',
+          }}
+          businessHours={true}
+          eventDisplay={'block'}
+          nowIndicator={true}
+        />
+      </Box>
 
       <NewEventDialog //イベント登録モーダル
         isOpen={isNewEventDialogOpen}

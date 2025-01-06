@@ -8,26 +8,26 @@ import {
   RadioGroup,
 } from '@mui/material';
 import { z } from 'zod';
-import { Controller, useForm, useWatch } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import { ACCEPTED_FILE_TYPES, MAX_UPLOAD_SIZE } from '@/constants/imageSetting';
 import { TextFieldRHF } from '../../../../components/forms/TextFieldRHF';
 import { DatePickerRHF } from '../../../../components/forms/DatePickerRHF';
-import {
-  PatchEventRequestBody,
-  PatchEventResponseSuccessBody,
-} from '@/pages/api/events/[id]';
+import { PatchEventRequestBody } from '@/pages/api/events/[id]';
 import { EventT } from '@/types/EventT';
 import { useSnackbarContext } from '@/providers/SnackbarProvider';
 import { EventPhoto } from './EventPhoto';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { EventPhotoT } from '@/types/EventPhotoT';
-import { useRef, useState } from 'react';
-
-import { PostGenerateSignedUrlsResposeSuccessBody } from '@/pages/api/generateSignedUrls';
+import { useState } from 'react';
 import { postGenerateSignedUrls } from '@/apis/postGenerateSignedUrls';
 import { patchEvent } from '@/apis/events/pachEvent';
+import EditNoteIcon from '@mui/icons-material/EditNote';
+import GroupIcon from '@mui/icons-material/Group';
+import LinkIcon from '@mui/icons-material/Link';
+import PlaceIcon from '@mui/icons-material/Place';
+import EventNoteIcon from '@mui/icons-material/EventNote';
 
 const eventScheme = z.object({
   event: z
@@ -239,30 +239,34 @@ export const EditEventDialogContent = ({
           control={control}
           name="event.place"
           label="開催場所"
+          startIcon={<PlaceIcon />}
         />
         <TextFieldRHF<EventSchemaType>
           control={control}
           name="event.url"
           label="イベントページURL"
-          // リンクつける
+          startIcon={<LinkIcon />}
         />
         <TextFieldRHF<EventSchemaType>
           control={control}
           name="event.member"
           label="同行メンバー"
           multiline={true}
+          startIcon={<GroupIcon />}
         />
         <TextFieldRHF<EventSchemaType>
           control={control}
           name="event.memo"
           label="詳細memo"
           multiline={true}
+          startIcon={<EditNoteIcon />}
         />
         <TextFieldRHF<EventSchemaType>
           control={control}
           name="event.diary"
           label="イベントレポート"
           multiline={true}
+          startIcon={<EventNoteIcon />}
         />
         <Box sx={{ width: '100%' }}>
           <Box sx={{ fontSize: 'small', padding: '6px' }}>イベントフォト</Box>

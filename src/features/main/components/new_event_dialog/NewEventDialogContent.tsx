@@ -4,16 +4,16 @@ import { Button } from '@mui/material';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import axios from 'axios';
-import {
-  PostEventRequestBody,
-  PostEventResponseSuccessBody,
-} from '@/pages/api/events';
 import { format } from 'date-fns';
 import { TextFieldRHF } from '../../../../components/forms/TextFieldRHF';
 import { DatePickerRHF } from '../../../../components/forms/DatePickerRHF';
 import { useSnackbarContext } from '../../../../providers/SnackbarProvider';
 import { postEvent } from '@/apis/events/postEvent';
+import EditNoteIcon from '@mui/icons-material/EditNote';
+import GroupIcon from '@mui/icons-material/Group';
+import LinkIcon from '@mui/icons-material/Link';
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
+import PlaceIcon from '@mui/icons-material/Place';
 
 const eventScheme = z
   .object({
@@ -127,6 +127,7 @@ export const NewEventDialogContent = ({
           control={control}
           name="title"
           label="イベントタイトル"
+          startIcon={<DriveFileRenameOutlineIcon />}
         />
         <Box
           sx={{
@@ -151,23 +152,27 @@ export const NewEventDialogContent = ({
           control={control}
           name="place"
           label="開催場所"
+          startIcon={<PlaceIcon />}
         />
         <TextFieldRHF<EventSchemaType>
           control={control}
           name="url"
           label="イベントページURL"
+          startIcon={<LinkIcon />}
         />
         <TextFieldRHF<EventSchemaType>
           control={control}
           name="member"
           label="同行メンバー"
           multiline={true}
+          startIcon={<GroupIcon />}
         />
         <TextFieldRHF<EventSchemaType>
           control={control}
           name="memo"
           label="詳細memo"
           multiline={true}
+          startIcon={<EditNoteIcon />}
         />
         <Box
           sx={{

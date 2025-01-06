@@ -13,6 +13,11 @@ import ModeEditTwoToneIcon from '@mui/icons-material/ModeEditTwoTone';
 import { ACCEPTED_FILE_TYPES, MAX_UPLOAD_SIZE } from '@/constants/imageSetting';
 import { postGenerateSignedUrls } from '@/apis/postGenerateSignedUrls';
 import { patchUser } from '@/apis/users/patchUser';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import StarsIcon from '@mui/icons-material/Stars';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import PlaceIcon from '@mui/icons-material/Place';
+import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 
 const userProfileScheme = z.object({
   name: z.string(),
@@ -187,6 +192,7 @@ export const EditUserDialogContent = ({
           control={control}
           name="name"
           label="名前"
+          startIcon={<SentimentSatisfiedAltIcon />}
         />
 
         <Box sx={{ width: '100%' }}>
@@ -225,12 +231,14 @@ export const EditUserDialogContent = ({
           label="イベント参加地域"
           multiline={true}
           autoComplete="off"
+          startIcon={<PlaceIcon />}
         />
         <TextFieldRHF<UserProfileSchemaType>
           control={control}
           name="favoriteType"
           label="好きなイベントのタイプ"
           multiline={true}
+          startIcon={<FavoriteBorderIcon />}
         />
 
         <TextFieldRHF<UserProfileSchemaType>
@@ -238,12 +246,14 @@ export const EditUserDialogContent = ({
           name="strongPoints"
           label="得意な謎、配役等"
           multiline={true}
+          startIcon={<StarsIcon />}
         />
         <TextFieldRHF<UserProfileSchemaType>
           control={control}
           name="favoriteGroup"
           label="よく行く、推しの団体"
           multiline={true}
+          startIcon={<FavoriteIcon />}
         />
 
         <Box
