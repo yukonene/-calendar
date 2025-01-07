@@ -6,6 +6,12 @@ import { UserT } from '@/types/UserT';
 import { auth } from '@/lib/firebase/firebaseClient';
 import router from 'next/router';
 import { getUser } from '@/apis/users/getUser';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import StarsIcon from '@mui/icons-material/Stars';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import PlaceIcon from '@mui/icons-material/Place';
+import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
+import MilitaryTechSharpIcon from '@mui/icons-material/MilitaryTechSharp';
 
 export const User = () => {
   const [editUserDialogOpen, SetEditUserDialogOpen] = useState(false);
@@ -103,6 +109,7 @@ export const User = () => {
                 color: '#7aabaa',
               }}
             >
+              <SentimentSatisfiedAltIcon sx={{ fontSize: 'small' }} />
               名前
             </Box>
             <Box sx={{ wordBreak: 'break-word' }}>{user.name}</Box>
@@ -132,6 +139,7 @@ export const User = () => {
                 component={'label'}
                 sx={{ fontSize: 'small', color: '#7aabaa' }}
               >
+                <PlaceIcon sx={{ fontSize: 'small' }} />
                 イベント参加地域
               </Box>
               <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
@@ -155,6 +163,7 @@ export const User = () => {
                 component={'label'}
                 sx={{ fontSize: 'small', color: '#7aabaa' }}
               >
+                <FavoriteBorderIcon sx={{ fontSize: 'small' }} />
                 好きなイベントのタイプ
               </Box>
               <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
@@ -178,6 +187,7 @@ export const User = () => {
                 component={'label'}
                 sx={{ fontSize: 'small', color: '#7aabaa' }}
               >
+                <StarsIcon sx={{ fontSize: 'small' }} />
                 得意な謎、配役等
               </Box>
               <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
@@ -201,6 +211,7 @@ export const User = () => {
                 component={'label'}
                 sx={{ fontSize: 'small', color: '#7aabaa' }}
               >
+                <FavoriteIcon sx={{ fontSize: 'small' }} />
                 よく行く、推しの団体
               </Box>
               <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
@@ -211,7 +222,8 @@ export const User = () => {
 
           {/* 戦績 */}
           {!!user.winRate && (
-            <Box sx={{ display: 'flex', margin: 'auto' }}>
+            <Box sx={{ display: 'flex', margin: 'auto', color: '#ffa07a' }}>
+              <MilitaryTechSharpIcon />
               <Box>脱出成功率{user.winRate}%</Box>
             </Box>
           )}

@@ -204,13 +204,27 @@ export const EditUserDialogContent = ({
               sx={{ width: '70px', height: '70px', marginBottom: '8px' }}
             />
           )}
-          <input
-            name="avatar"
-            type="file"
-            accept="image/*"
-            onChange={onChangeAvatar}
-            ref={avatarInputRef}
-          />
+          <label
+            htmlFor={'file_photo'}
+            style={{
+              backgroundColor: '#f3f3f3',
+              padding: '8px 20px',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              color: '#191970',
+            }}
+          >
+            ＋写真を選択
+            <input
+              name="avatar"
+              type="file"
+              accept="image/*"
+              onChange={onChangeAvatar}
+              ref={avatarInputRef}
+              style={{ display: 'none' }}
+              id={'file_photo'}
+            />
+          </label>
 
           {!!avatarUrl && (
             <Button

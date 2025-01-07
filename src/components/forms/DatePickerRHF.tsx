@@ -1,4 +1,8 @@
-import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import {
+  DateTimePicker,
+  LocalizationProvider,
+  renderTimeViewClock,
+} from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
 import { ja } from 'date-fns/locale/ja';
 import { Control, Controller, FieldPath, FieldValues } from 'react-hook-form';
@@ -29,8 +33,8 @@ export const DatePickerRHF = <T extends FieldValues>(props: Props<T>) => {
               views={['month', 'day', 'hours', 'minutes']}
               ampm={false}
               viewRenderers={{
-                // hours: null,
-                // minutes: null,
+                hours: renderTimeViewClock,
+                minutes: renderTimeViewClock,
                 seconds: null,
               }}
               slotProps={{
