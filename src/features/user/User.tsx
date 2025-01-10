@@ -79,147 +79,177 @@ export const User = () => {
           padding: '16px',
           boxShadow: '2',
           maxWidth: '700px',
-
+          backgroundColor: 'white',
           margin: 'auto',
           marginTop: '8px',
         }}
       >
-        {/* コンテンツ */}
+        {/* //////コンテンツ////////////////////////////////////// */}
         <Box
           sx={{
             display: 'flex',
             gap: '16px',
             flexWrap: 'wrap',
+            flexDirection: 'column',
           }}
         >
           <Box
             sx={{
               display: 'flex',
-              flexDirection: 'column',
-              border: '1px double white',
-              borderRadius: '20px',
-              padding: '16px',
-              boxShadow: '2',
+              gap: '16px',
             }}
           >
+            {/* 名前/////////// */}
             <Box
-              component={'label'}
               sx={{
-                fontSize: 'small',
-                color: '#7aabaa',
+                display: 'flex',
+                flexDirection: 'column',
+                border: '1px double white',
+                borderRadius: '20px',
+                padding: '16px',
+                boxShadow: '2',
+                width: '250px',
               }}
             >
-              <SentimentSatisfiedAltIcon sx={{ fontSize: 'small' }} />
-              名前
+              <Box
+                component={'label'}
+                sx={{
+                  fontSize: 'small',
+                  color: '#7aabaa',
+                }}
+              >
+                <SentimentSatisfiedAltIcon sx={{ fontSize: 'small' }} />
+                名前
+              </Box>
+              <Box sx={{ wordBreak: 'break-word' }}>{user.name}</Box>
             </Box>
-            <Box sx={{ wordBreak: 'break-word' }}>{user.name}</Box>
+
+            {/* プロフィール画像 */}
+            {!!user.avatarUrl && (
+              <Avatar
+                src={user.avatarUrl}
+                alt="avatar"
+                sx={{ width: '70px', height: '70px', marginBottom: '8px' }}
+              />
+            )}
+          </Box>
+          <Box
+            sx={{
+              display: 'flex',
+              gap: '16px',
+            }}
+          >
+            {/* イベント参加地域//////// */}
+            {!!user.activityAreas && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  border: '1px double white',
+                  borderRadius: '20px',
+                  padding: '16px',
+                  boxShadow: '2',
+                  width: '200px',
+                }}
+              >
+                <Box
+                  component={'label'}
+                  sx={{ fontSize: 'small', color: '#7aabaa' }}
+                >
+                  <PlaceIcon sx={{ fontSize: 'small' }} />
+                  イベント参加地域
+                </Box>
+                <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                  {user.activityAreas}
+                </Box>
+              </Box>
+            )}
+
+            {/* 好きなイベントのタイプ/////////// */}
+            {!!user.favoriteType && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  border: '1px double white',
+                  borderRadius: '20px',
+                  padding: '16px',
+                  boxShadow: '2',
+                  width: '200px',
+                }}
+              >
+                <Box
+                  component={'label'}
+                  sx={{ fontSize: 'small', color: '#7aabaa' }}
+                >
+                  <FavoriteBorderIcon sx={{ fontSize: 'small' }} />
+                  好きなイベントのタイプ
+                </Box>
+                <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                  {user.favoriteType}
+                </Box>
+              </Box>
+            )}
           </Box>
 
-          {/* プロフィール画像 */}
-          {!!user.avatarUrl && (
-            <Avatar
-              src={user.avatarUrl}
-              alt="avatar"
-              sx={{ width: '70px', height: '70px', marginBottom: '8px' }}
-            />
-          )}
-
-          {!!user.activityAreas && (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                border: '1px double white',
-                borderRadius: '20px',
-                padding: '16px',
-                boxShadow: '2',
-              }}
-            >
+          <Box
+            sx={{
+              display: 'flex',
+              gap: '16px',
+            }}
+          >
+            {/* 得意な謎、配役等////////////// */}
+            {!!user.strongPoints && (
               <Box
-                component={'label'}
-                sx={{ fontSize: 'small', color: '#7aabaa' }}
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  border: '1px double white',
+                  borderRadius: '20px',
+                  padding: '16px',
+                  boxShadow: '2',
+                  width: '200px',
+                }}
               >
-                <PlaceIcon sx={{ fontSize: 'small' }} />
-                イベント参加地域
+                <Box
+                  component={'label'}
+                  sx={{ fontSize: 'small', color: '#7aabaa' }}
+                >
+                  <StarsIcon sx={{ fontSize: 'small' }} />
+                  得意な謎、配役等
+                </Box>
+                <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                  {user.strongPoints}
+                </Box>
               </Box>
-              <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                {user.activityAreas}
-              </Box>
-            </Box>
-          )}
+            )}
 
-          {!!user.favoriteType && (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                border: '1px double white',
-                borderRadius: '20px',
-                padding: '16px',
-                boxShadow: '2',
-              }}
-            >
+            {/* よく行く、推しの団体//////// */}
+            {!!user.favoriteGroup && (
               <Box
-                component={'label'}
-                sx={{ fontSize: 'small', color: '#7aabaa' }}
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  border: '1px double white',
+                  borderRadius: '20px',
+                  padding: '16px',
+                  boxShadow: '2',
+                  width: '200px',
+                }}
               >
-                <FavoriteBorderIcon sx={{ fontSize: 'small' }} />
-                好きなイベントのタイプ
+                <Box
+                  component={'label'}
+                  sx={{ fontSize: 'small', color: '#7aabaa' }}
+                >
+                  <FavoriteIcon sx={{ fontSize: 'small' }} />
+                  よく行く、推しの団体
+                </Box>
+                <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                  {user.favoriteGroup}
+                </Box>
               </Box>
-              <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                {user.favoriteType}
-              </Box>
-            </Box>
-          )}
-
-          {!!user.strongPoints && (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                border: '1px double white',
-                borderRadius: '20px',
-                padding: '16px',
-                boxShadow: '2',
-              }}
-            >
-              <Box
-                component={'label'}
-                sx={{ fontSize: 'small', color: '#7aabaa' }}
-              >
-                <StarsIcon sx={{ fontSize: 'small' }} />
-                得意な謎、配役等
-              </Box>
-              <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                {user.strongPoints}
-              </Box>
-            </Box>
-          )}
-
-          {!!user.favoriteGroup && (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                border: '1px double white',
-                borderRadius: '20px',
-                padding: '16px',
-                boxShadow: '2',
-              }}
-            >
-              <Box
-                component={'label'}
-                sx={{ fontSize: 'small', color: '#7aabaa' }}
-              >
-                <FavoriteIcon sx={{ fontSize: 'small' }} />
-                よく行く、推しの団体
-              </Box>
-              <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                {user.favoriteGroup}
-              </Box>
-            </Box>
-          )}
-
+            )}
+          </Box>
           {/* 戦績 */}
           {!!user.winRate && (
             <Box sx={{ display: 'flex', margin: 'auto', color: '#ffa07a' }}>
@@ -237,7 +267,13 @@ export const User = () => {
         />
         <Button
           variant="contained"
-          sx={{ width: '150px', marginTop: '16px', margin: '8px' }}
+          sx={{
+            width: '150px',
+            marginTop: '16px',
+            margin: '8px',
+            backgroundColor: '#4169e1',
+            blockSize: '30px',
+          }}
           onClick={handleEditUserClick}
         >
           編集
@@ -245,7 +281,7 @@ export const User = () => {
         <Box sx={{ display: 'flex' }}>
           <Button
             onClick={logout}
-            sx={{ marginLeft: 'auto', fontSize: 'small' }}
+            sx={{ marginLeft: 'auto', fontSize: 'small', color: '#b0c4de' }}
           >
             ログアウト
           </Button>

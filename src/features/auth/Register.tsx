@@ -166,6 +166,7 @@ export const Register = () => {
           flexDirection: 'column',
           alignItems: 'center',
           width: '350px',
+          backgroundColor: 'white',
         }}
       >
         <Box component="h1" sx={{ paddingBottom: '32px' }}>

@@ -80,6 +80,7 @@ export const DesktopEvent = ({ eventId }: Props) => {
         borderRadius: '20px',
         padding: '16px',
         boxShadow: '2',
+        backgroundColor: 'white',
       }}
     >
       {/* タイトル */}

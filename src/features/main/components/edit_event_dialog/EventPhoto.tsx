@@ -54,13 +54,27 @@ export const EventPhoto = ({ setValue, index, eventPhoto }: Props) => {
           }}
         />
       )}
-      <input
-        name="eventPhoto"
-        type="file"
-        accept="image/*"
-        onChange={onChangeEventPhoto}
-        ref={eventPhotoInputRef}
-      />
+      <label
+        htmlFor={'file_event'}
+        style={{
+          backgroundColor: '#f3f3f3',
+          padding: '8px 20px',
+          borderRadius: '8px',
+          cursor: 'pointer',
+          color: '#191970',
+        }}
+      >
+        ＋写真を選択
+        <input
+          name="eventPhoto"
+          type="file"
+          accept="image/*"
+          onChange={onChangeEventPhoto}
+          ref={eventPhotoInputRef}
+          style={{ display: 'none' }}
+          id={'file_event'}
+        />
+      </label>
 
       {!!eventPhotoUrl && (
         <Button

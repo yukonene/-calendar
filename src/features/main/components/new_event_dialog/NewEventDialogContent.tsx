@@ -107,6 +107,7 @@ export const NewEventDialogContent = ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        backgroundColor: 'white',
       }}
     >
       <Box component="h3">{format(date, ' MM月dd日')}</Box>

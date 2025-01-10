@@ -175,6 +175,7 @@ export const EditUserDialogContent = ({
         padding: '24px',
         boxShadow: '3',
         alignItems: 'center',
+        backgroundColor: 'white',
       }}
     >
       <Box

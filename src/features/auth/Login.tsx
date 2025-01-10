@@ -112,9 +112,10 @@ export const Login = () => {
           width: '350px',
         }}
       >
-        <Box component="h1" sx={{ paddingBottom: '32px' }}>
+        <Box component="h1" sx={{ paddingBottom: '32px', fontSize: '20px' }}>
           {process.env.NEXT_PUBLIC_APP_TITLE}
         </Box>
+
         <Box
           component="form"
           onSubmit={handleSubmit(login)}
@@ -127,6 +128,7 @@ export const Login = () => {
             border: '1px solid gray',
             borderRadius: '5px',
             padding: '32px',
+            backgroundColor: 'white',
           }}
         >
           <Box component="h4">ログイン</Box>

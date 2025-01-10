@@ -61,7 +61,7 @@ export const DesktopNeneCalendar = ({ setEventId }: Props) => {
   }, [eventInfoList]);
 
   return (
-    <Box sx={{ height: '100%' }}>
+    <Box sx={{ height: '100%', backgroundColor: 'white' }}>
       <Box sx={{ OverflowY: 'hiddon', height: '100%' }}>
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}

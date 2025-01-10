@@ -69,7 +69,7 @@ export const MobileMain = () => {
   }, []);
 
   return (
-    <Box sx={{ padding: '12px' }}>
+    <Box sx={{ padding: '12px', backgroundColor: 'white' }}>
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"

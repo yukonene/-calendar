@@ -71,6 +71,7 @@ export const ChangePassword = () => {
           border: '1px solid gray',
           borderRadius: '5px',
           padding: '32px',
+          backgroundColor: 'white',
         }}
       >
         <Box component="h4" sx={{ marginBottom: '20px' }}>
